@@ -5,6 +5,7 @@ type DbInterface interface {
 	Save(interface{}) bool
 	Get(interface{}) (interface{}, error)
 	Update()
+	SaveSession(string, interface{})
 }
 
 type Cursor struct {

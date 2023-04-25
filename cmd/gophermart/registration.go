@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
@@ -19,7 +22,19 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "user already exists", http.StatusConflict)
 		return
 	}
-	rw.WriteHeader(http.StatusOK)
+	sessionToken := uuid.NewString()
+	expiresAt := time.Now().Add(5 * time.Second)
 
+	h.Cursor.SaveSession(sessionToken, &Session{
+		Username:  userInput.Username,
+		ExpiresAt: expiresAt,
+	})
+
+	rw.WriteHeader(http.StatusOK)
+	http.SetCookie(rw, &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: expiresAt,
+	})
 	rw.Write([]byte(`user created successfully`))
 }

@@ -13,18 +13,25 @@ import (
 
 type MockDb struct {
 	DbInterface
-	storage map[string]string
+	storage  map[string]string
+	sessions map[string]Session
 }
 
 func NewMock() *MockDb {
 	return &MockDb{
-		storage: make(map[string]string),
+		storage:  make(map[string]string),
+		sessions: make(map[string]Session),
 	}
 }
 
 func (mock *MockDb) Connect() {}
 
 func (mock *MockDb) Update() {}
+
+func (mock *MockDb) SaveSession(id string, data interface{}) {
+	convertedData := *data.(*Session)
+	mock.sessions[id] = convertedData
+}
 
 func (mock *MockDb) Save(data interface{}) bool {
 	convertedData := *data.(*UserInfo)
