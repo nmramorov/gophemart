@@ -16,11 +16,15 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if ok := h.Cursor.Save(userInput); !ok {
-		http.Error(rw, "user already exists", http.StatusBadRequest)
+	if err := ValidateUserRegistrationInfo(userInput); err != nil {
+		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	rw.WriteHeader(http.StatusCreated)
+	if ok := h.Cursor.Save(userInput); !ok {
+		http.Error(rw, "user already exists", http.StatusConflict)
+		return
+	}
+	rw.WriteHeader(http.StatusOK)
 
 	rw.Write([]byte(`user created successfully`))
 }

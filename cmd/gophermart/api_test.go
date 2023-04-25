@@ -67,7 +67,7 @@ func TestAPI(t *testing.T) {
 		{
 			name: "Test Positive registration",
 			want: want{
-				code:     201,
+				code:     200,
 				response: `user created successfully`,
 			},
 			args: arguments{
@@ -81,7 +81,7 @@ func TestAPI(t *testing.T) {
 		{
 			name: "Test Negative registration user exists",
 			want: want{
-				code:     400,
+				code:     409,
 				response: "user already exists\n",
 			},
 			args: arguments{
@@ -93,9 +93,20 @@ func TestAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "Test Negative registration user exists and different password",
+			name: "Test Negative registration invalid request",
 			want: want{
 				code:     400,
+				response: "validation error\n",
+			},
+			args: arguments{
+				url: "http://localhost:8080/api/user/register",
+				payload: userinfo{},
+			},
+		},
+		{
+			name: "Test Negative registration user exists and different password",
+			want: want{
+				code:     409,
 				response: "user already exists\n",
 			},
 			args: arguments{
