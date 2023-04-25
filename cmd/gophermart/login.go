@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
@@ -24,6 +27,20 @@ func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
 		return
 	}
+	sessionToken := uuid.NewString()
+	expiresAt := time.Now().Add(5 * time.Second)
+
+	h.Cursor.SaveSession(sessionToken, &Session{
+		Username:  userInput.Username,
+		ExpiresAt: expiresAt,
+	})
+
+	rw.WriteHeader(http.StatusOK)
+	http.SetCookie(rw, &http.Cookie{
+		Name:    "session_token",
+		Value:   sessionToken,
+		Expires: expiresAt,
+	})
 	rw.WriteHeader(http.StatusOK)
 
 	rw.Write([]byte(`success`))
