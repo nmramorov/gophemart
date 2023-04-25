@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
+func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 	userInput := &UserInfo{}
 	if err := json.NewDecoder(r.Body).Decode(&userInput); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
@@ -15,11 +15,16 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if ok := h.Cursor.Save(userInput); !ok {
-		http.Error(rw, "user already exists", http.StatusConflict)
+	dbData, err := h.Cursor.Get(userInput)
+	if err != nil {
+		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
+		return
+	}
+	if err := ValidateLogin(userInput, dbData.(*UserInfo)); err != nil {
+		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
 		return
 	}
 	rw.WriteHeader(http.StatusOK)
 
-	rw.Write([]byte(`user created successfully`))
+	rw.Write([]byte(`success`))
 }

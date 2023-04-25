@@ -3,7 +3,7 @@ package main
 type DbInterface interface {
 	Connect()
 	Save(interface{}) bool
-	Get()
+	Get(interface{}) (interface{}, error)
 	Update()
 }
 
