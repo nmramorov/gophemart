@@ -7,11 +7,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestPostOrders(t *testing.T) {
 	type want struct {
@@ -166,6 +166,100 @@ func TestPostOrders(t *testing.T) {
 	}
 }
 
+func TestGetOrders(t *testing.T) {
+	type want struct {
+		code     int
+		response string
+	}
+	type arguments struct {
+		url string
+	}
+	tests := []struct {
+		name string
+		want want
+		args arguments
+	}{
+		{
+			name: "Test Positive get order no data found",
+			want: want{
+				code:     204,
+				response: "no orders foun",
+			},
+			args: arguments{
+				url: "http://localhost:8080/api/user/orders",
+			},
+		},
+		{
+			name: "Test Positive order get",
+			want: want{
+				code:     200,
+				response: `[{"number":"9278923470","status":"PROCESSED","accrual":500,"uploaded_at":"2020-12-10T15:15:45+03:00"},{"number":"12345678903","status":"PROCESSING","uploaded_at":"2020-12-10T15:12:01+03:00"},{"number":"346436439","status":"INVALID","uploaded_at":"2020-12-09T16:09:53+03:00"},{"number":"3464364393333","status":"NEW","uploaded_at":"2020-12-09T16:09:53+03:00"}]`,
+			},
+			args: arguments{
+				url: "http://localhost:8080/api/user/orders",
+			},
+		},
+	}
+	layout := "2006-01-02T15:04:05Z07:00"
+	parseTime := func(layout string, toParse string) time.Time {
+		parsed, _ := time.Parse(layout, toParse)
+		return parsed
+	}
+	orders := []*Order{
+		{
+			Number:     "9278923470",
+			Status:     "PROCESSED",
+			Accrual:    500,
+			UploadedAt: parseTime(layout, "2020-12-10T15:15:45+03:00"),
+		},
+		{
+			Number:     "12345678903",
+			Status:     "PROCESSING",
+			UploadedAt: parseTime(layout, "2020-12-10T15:12:01+03:00"),
+		},
+		{
+			Number:     "346436439",
+			Status:     "INVALID",
+			UploadedAt: parseTime(layout, "2020-12-09T16:09:53+03:00"),
+		},
+		{
+			Number:     "3464364393333",
+			Status:     "NEW",
+			UploadedAt: parseTime(layout, "2020-12-09T16:09:53+03:00"),
+		},
+	}
+	handler := &Handler{
+		Mux: chi.NewMux(),
+		Cursor: &Cursor{
+			NewMock(),
+		},
+	}
+	handler.Get("/api/user/orders", handler.GetOrders)
+	ts := httptest.NewServer(handler)
 
+	defer ts.Close()
 
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, tt.args.url, nil)
 
+			w := httptest.NewRecorder()
+			if tt.name == "Test Positive order get" {
+				for _, order := range orders {
+					handler.Cursor.SaveOrder(order)
+				}
+			}
+			handler.ServeHTTP(w, request)
+			res := w.Result()
+
+			assert.Equal(t, tt.want.code, res.StatusCode)
+
+			defer res.Body.Close()
+			resBody, err := io.ReadAll(res.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, tt.want.response, string(resBody)[:len(string(resBody)) - 1])
+		})
+	}
+}

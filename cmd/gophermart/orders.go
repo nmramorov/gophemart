@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"strconv"
@@ -69,4 +71,21 @@ func GetOrderFromDb(cursor *Cursor, requestOrder string) (*Order, error) {
 		return nil, err
 	}
 	return order, nil
+}
+
+func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
+	orders, err := h.Cursor.GetOrders()
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+	if orders == nil {
+		rw.WriteHeader(http.StatusNoContent)
+		rw.Write([]byte(`no orders found`))
+	} else {
+		body := bytes.NewBuffer([]byte{})
+		encoder := json.NewEncoder(body)
+		encoder.Encode(&orders)
+		rw.Header().Set("Content-Type", "application/json")
+		rw.Write(body.Bytes())
+	}
 }

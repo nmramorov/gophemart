@@ -72,3 +72,10 @@ func (mock *MockDb) SaveOrder(order interface{}) {
 	mockOrder := order.(*Order)
 	mock.orders = append(mock.orders, mockOrder)
 }
+
+func (mock *MockDb) GetOrders() (interface{}, error) {
+	if len(mock.orders) == 0 {
+		return nil, nil
+	}
+	return mock.orders, nil
+}

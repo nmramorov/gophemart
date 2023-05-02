@@ -14,9 +14,9 @@ type Session struct {
 }
 
 type Order struct {
-	Number string
-	Token string
-	Status string
-	Accrual int
-	UploadedAt time.Time
+	Number     string    `json:"number"`
+	Token      string    `json:"token,omitempty"`
+	Status     string    `json:"status"`
+	Accrual    int       `json:"accrual,omitempty"`
+	UploadedAt time.Time `json:"uploaded_at"`
 }

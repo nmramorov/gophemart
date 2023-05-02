@@ -8,6 +8,7 @@ type DbInterface interface {
 	SaveSession(string, interface{})
 	GetOrder(interface{}) (interface{}, error)
 	SaveOrder(interface{})
+	GetOrders() (interface{}, error)
 }
 
 type Cursor struct {
