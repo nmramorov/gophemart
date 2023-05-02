@@ -15,7 +15,7 @@ type Session struct {
 
 type Order struct {
 	Number     string    `json:"number"`
-	Token      string    `json:"token,omitempty"`
+	Username   string    `json:"-"`
 	Status     string    `json:"status"`
 	Accrual    int       `json:"accrual,omitempty"`
 	UploadedAt time.Time `json:"uploaded_at"`

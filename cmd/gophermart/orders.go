@@ -25,6 +25,10 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := r.Cookie("session_token")
 	sessionToken := cookie.Value
+	username, err := h.Cursor.GetUsernameByToken(sessionToken)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
 
 	requestNumber := string(body)
 
@@ -42,7 +46,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	if order == nil {
 		h.Cursor.SaveOrder(&Order{
 			Number:     requestNumber,
-			Token:      sessionToken,
+			Username:   username,
 			UploadedAt: time.Now(),
 		})
 		rw.WriteHeader(http.StatusAccepted)
@@ -50,7 +54,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if order.Token != sessionToken {
+	if order.Username != username {
 		http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
 		return
 	}

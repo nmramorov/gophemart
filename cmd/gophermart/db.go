@@ -9,6 +9,7 @@ type DbInterface interface {
 	GetOrder(interface{}) (interface{}, error)
 	SaveOrder(interface{})
 	GetOrders() (interface{}, error)
+	GetUsernameByToken(token string) (string, error)
 }
 
 type Cursor struct {

@@ -1,6 +1,8 @@
 package main
 
-import "github.com/go-chi/chi/v5"
+import (
+	"github.com/go-chi/chi/v5"
+)
 
 type MockDb struct {
 	DbInterface
@@ -78,4 +80,12 @@ func (mock *MockDb) GetOrders() (interface{}, error) {
 		return nil, nil
 	}
 	return mock.orders, nil
+}
+
+func (mock *MockDb) GetUsernameByToken(token string) (string, error) {
+	session, ok := mock.sessions[token]
+	if !ok {
+		return "", ErrValidation
+	}
+	return session.Username, nil
 }
