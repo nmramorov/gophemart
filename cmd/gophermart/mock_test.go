@@ -1,11 +1,17 @@
 package main
 
+import "github.com/go-chi/chi/v5"
 
 type MockDb struct {
 	DbInterface
 	storage  map[string]string
 	sessions map[string]Session
 	orders   []*Order
+}
+
+type TestHandler struct {
+	*chi.Mux
+	DbApi *MockDb
 }
 
 func NewMock() *MockDb {
