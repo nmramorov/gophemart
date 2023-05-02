@@ -28,13 +28,14 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 	h.Cursor.SaveSession(sessionToken, &Session{
 		Username:  userInput.Username,
 		ExpiresAt: expiresAt,
+		Token: sessionToken,
 	})
 
-	rw.WriteHeader(http.StatusOK)
 	http.SetCookie(rw, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
 		Expires: expiresAt,
 	})
+	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte(`user created successfully`))
 }

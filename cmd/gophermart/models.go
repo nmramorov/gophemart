@@ -10,4 +10,13 @@ type UserInfo struct {
 type Session struct {
 	Username  string
 	ExpiresAt time.Time
+	Token     string
+}
+
+type Order struct {
+	Number string
+	Token string
+	Status string
+	Accrual int
+	UploadedAt time.Time
 }

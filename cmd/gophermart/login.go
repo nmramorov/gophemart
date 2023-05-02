@@ -33,9 +33,9 @@ func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 	h.Cursor.SaveSession(sessionToken, &Session{
 		Username:  userInput.Username,
 		ExpiresAt: expiresAt,
+		Token: sessionToken,
 	})
 
-	rw.WriteHeader(http.StatusOK)
 	http.SetCookie(rw, &http.Cookie{
 		Name:    "session_token",
 		Value:   sessionToken,
