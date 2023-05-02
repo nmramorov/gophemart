@@ -20,3 +20,9 @@ type Order struct {
 	Accrual    int       `json:"accrual,omitempty"`
 	UploadedAt time.Time `json:"uploaded_at"`
 }
+
+type Balance struct {
+	User string `json:"-"`
+	Current float64 `json:"current"`
+	Withdrawn int `json:"withdrawn"`
+}

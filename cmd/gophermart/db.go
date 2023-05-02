@@ -10,6 +10,8 @@ type DbInterface interface {
 	SaveOrder(interface{})
 	GetOrders() (interface{}, error)
 	GetUsernameByToken(token string) (string, error)
+	GetUserBalance(username string) (*Balance, error)
+	UpdateUserBalance(username string, newBalance *Balance) *Balance
 }
 
 type Cursor struct {

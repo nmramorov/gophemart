@@ -9,6 +9,7 @@ type MockDb struct {
 	storage  map[string]string
 	sessions map[string]Session
 	orders   []*Order
+	balance  map[string]*Balance
 }
 
 type TestHandler struct {
@@ -21,6 +22,7 @@ func NewMock() *MockDb {
 		storage:  make(map[string]string),
 		sessions: make(map[string]Session),
 		orders:   make([]*Order, 0),
+		balance:  make(map[string]*Balance),
 	}
 }
 
@@ -88,4 +90,17 @@ func (mock *MockDb) GetUsernameByToken(token string) (string, error) {
 		return "", ErrValidation
 	}
 	return session.Username, nil
+}
+
+func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
+	balance, ok := mock.balance[username]
+	if !ok {
+		return nil, ErrValidation
+	}
+	return balance, nil
+}
+
+func (mock *MockDb) UpdateUserBalance(username string, newBalance *Balance) *Balance {
+	mock.balance[username] = newBalance
+	return newBalance
 }
