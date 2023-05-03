@@ -18,7 +18,7 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if ok := h.Cursor.Save(userInput); !ok {
+	if ok := h.Cursor.SaveUserInfo(userInput); !ok {
 		http.Error(rw, "user already exists", http.StatusConflict)
 		return
 	}

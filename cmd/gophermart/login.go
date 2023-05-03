@@ -18,12 +18,12 @@ func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
-	dbData, err := h.Cursor.Get(userInput)
+	dbData, err := h.Cursor.GetUserInfo(userInput)
 	if err != nil {
 		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
 		return
 	}
-	if err := ValidateLogin(userInput, dbData.(*UserInfo)); err != nil {
+	if err := ValidateLogin(userInput, dbData); err != nil {
 		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
 		return
 	}

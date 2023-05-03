@@ -99,7 +99,7 @@ func TestPostOrders(t *testing.T) {
 	handler.Post("/api/user/login", handler.Login)
 	handler.Post("/api/user/orders", handler.UploadOrder)
 	ts := httptest.NewServer(handler)
-	handler.Cursor.Save(&UserInfo{
+	handler.Cursor.SaveUserInfo(&UserInfo{
 		Username: "test",
 		Password: "test",
 	})

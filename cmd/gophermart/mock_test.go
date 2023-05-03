@@ -30,28 +30,25 @@ func (mock *MockDb) Connect() {}
 
 func (mock *MockDb) Update() {}
 
-func (mock *MockDb) SaveSession(id string, data interface{}) {
-	convertedData := *data.(*Session)
-	mock.sessions[id] = convertedData
+func (mock *MockDb) SaveSession(id string, session *Session) {
+	mock.sessions[id] = *session
 }
 
-func (mock *MockDb) Save(data interface{}) bool {
-	convertedData := *data.(*UserInfo)
+func (mock *MockDb) SaveUserInfo(info *UserInfo) bool {
 
 	for k := range mock.storage {
-		if k == convertedData.Username {
+		if k == info.Username {
 			return false
 		}
 	}
 
-	mock.storage[convertedData.Username] = convertedData.Password
+	mock.storage[info.Username] = info.Password
 	return true
 }
 
-func (mock *MockDb) Get(data interface{}) (interface{}, error) {
-	convertedData := *data.(*UserInfo)
+func (mock *MockDb) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 	for k, v := range mock.storage {
-		if k == convertedData.Username {
+		if k == info.Username {
 			return &UserInfo{
 				Username: k,
 				Password: v,
@@ -61,10 +58,9 @@ func (mock *MockDb) Get(data interface{}) (interface{}, error) {
 	return nil, ErrValidation
 }
 
-func (mock *MockDb) GetOrder(number interface{}) (interface{}, error) {
-	mockNumber := number.(string)
+func (mock *MockDb) GetOrder(number string) (*Order, error) {
 	for _, order := range mock.orders {
-		if order.Number == mockNumber {
+		if order.Number == number {
 			return order, nil
 		}
 	}
@@ -72,9 +68,8 @@ func (mock *MockDb) GetOrder(number interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func (mock *MockDb) SaveOrder(order interface{}) {
-	mockOrder := order.(*Order)
-	mock.orders = append(mock.orders, mockOrder)
+func (mock *MockDb) SaveOrder(order *Order) {
+	mock.orders = append(mock.orders, order)
 }
 
 func (mock *MockDb) GetOrders() ([]*Order, error) {
@@ -103,8 +98,4 @@ func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
 func (mock *MockDb) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	mock.balance[username] = newBalance
 	return newBalance
-}
-
-func (mock *MockDb) GetUserTotalAccrual(username string) float64 {
-	return mock.balance[username].Current
 }

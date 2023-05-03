@@ -66,12 +66,8 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 }
 
 func GetOrderFromDb(cursor *Cursor, requestOrder string) (*Order, error) {
-	dbData, err := cursor.GetOrder(requestOrder)
-	if dbData == nil {
-		return nil, nil
-	}
-	order := dbData.(*Order)
-	if err != nil {
+	order, err := cursor.GetOrder(requestOrder)
+	if order == nil {
 		return nil, err
 	}
 	return order, nil
