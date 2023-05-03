@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 )
@@ -37,13 +38,37 @@ func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resultedWithdrawn := userBalance.Withdrawn + withrawal.Sum
-
+	// ToDo!:Add withdrawal to Withdrawal table
 	_ = h.Cursor.UpdateUserBalance(username, &Balance{
-			User: username,
-			Current: resultedAccrual,
-			Withdrawn: resultedWithdrawn,
-		})
+		User:      username,
+		Current:   resultedAccrual,
+		Withdrawn: resultedWithdrawn,
+	})
 
 	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte(`success`))
+}
+
+func (h *Handler) GetWithdrawals(rw http.ResponseWriter, r *http.Request) {
+	cookie, _ := r.Cookie("session_token")
+	sessionToken := cookie.Value
+	username, err := h.Cursor.GetUsernameByToken(sessionToken)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	withdrawals, err := h.Cursor.GetWithdrawals(username)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+	buff := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(buff)
+	encoder.Encode(withdrawals)
+	rw.Header().Set("Content-Type", "application/json")
+
+	if withdrawals == nil {
+		rw.WriteHeader(http.StatusNoContent)
+
+	}
+	rw.Write(buff.Bytes())
 }

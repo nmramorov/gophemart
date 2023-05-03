@@ -6,10 +6,11 @@ import (
 
 type MockDb struct {
 	DbInterface
-	storage  map[string]string
-	sessions map[string]Session
-	orders   []*Order
-	balance  map[string]*Balance
+	storage     map[string]string
+	sessions    map[string]Session
+	orders      []*Order
+	balance     map[string]*Balance
+	withdrawals map[string][]*Withdrawal
 }
 
 type TestHandler struct {
@@ -19,10 +20,11 @@ type TestHandler struct {
 
 func NewMock() *MockDb {
 	return &MockDb{
-		storage:  make(map[string]string),
-		sessions: make(map[string]Session),
-		orders:   make([]*Order, 0),
-		balance:  make(map[string]*Balance),
+		storage:     make(map[string]string),
+		sessions:    make(map[string]Session),
+		orders:      make([]*Order, 0),
+		balance:     make(map[string]*Balance),
+		withdrawals: make(map[string][]*Withdrawal),
 	}
 }
 
@@ -98,4 +100,12 @@ func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
 func (mock *MockDb) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	mock.balance[username] = newBalance
 	return newBalance
+}
+
+func (mock *MockDb) GetWithdrawals(username string) ([]*Withdrawal, error) {
+	return mock.withdrawals[username], nil
+}
+
+func (mock *MockDb) SaveWithdrawal(username string, withdrawal *Withdrawal) {
+	mock.withdrawals[username] = append(mock.withdrawals[username], withdrawal)
 }

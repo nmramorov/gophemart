@@ -12,6 +12,8 @@ type DbInterface interface {
 	GetUsernameByToken(string) (string, error)
 	GetUserBalance(string) (*Balance, error)
 	UpdateUserBalance(string, *Balance) *Balance
+	GetWithdrawals(string) ([]*Withdrawal, error)
+	SaveWithdrawal(string, *Withdrawal)
 }
 
 type Cursor struct {

@@ -31,3 +31,10 @@ type WithdrawalPost struct {
 	Order string
 	Sum   float64
 }
+
+type Withdrawal struct {
+	User        string    `json:"-"`
+	Order       string    `json:"order"`
+	Sum         float64   `json:"sum"`
+	ProcessedAt time.Time `json:"processed_at"`
+}

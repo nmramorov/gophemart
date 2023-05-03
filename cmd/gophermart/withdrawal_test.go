@@ -91,8 +91,8 @@ func TestWithdrawal(t *testing.T) {
 	)
 	handler.Cursor.UpdateUserBalance(
 		"test", &Balance{
-			User: "test",
-			Current: 752,
+			User:      "test",
+			Current:   752,
 			Withdrawn: 0,
 		},
 	)
@@ -142,6 +142,134 @@ func TestWithdrawal(t *testing.T) {
 				t.Fatal(err)
 			}
 			assert.Equal(t, tt.want.response, string(resBody))
+		})
+	}
+}
+
+func TestGetWithdrawal(t *testing.T) {
+	layout := "2006-01-02T15:04:05Z07:00"
+	parseTime := func(layout string, toParse string) time.Time {
+		parsed, _ := time.Parse(layout, toParse)
+		return parsed
+	}
+	mockWithdrawals := []*Withdrawal{
+		{
+			Order:       "2377225624",
+			Sum:         500,
+			ProcessedAt: parseTime(layout, "2020-12-09T16:09:57+03:00"),
+		},
+		{
+			Order:       "1111111111",
+			Sum:         322,
+			ProcessedAt: parseTime(layout, "2020-12-09T16:09:57+03:00"),
+		},
+	}
+	type want struct {
+		code     int
+		response []*Withdrawal
+	}
+	type arguments struct {
+		url string
+	}
+	tests := []struct {
+		name string
+		want want
+		args arguments
+	}{
+		{
+			name: "Test Positive GET withdrawals",
+			want: want{
+				code:     200,
+				response: mockWithdrawals,
+			},
+			args: arguments{
+				url: "http://localhost:8080/api/user/withdrawals",
+			},
+		},
+		{
+			name: "Test Positive GET - no withdrawals found",
+			want: want{
+				code:     204,
+				response: nil,
+			},
+			args: arguments{
+				url: "http://localhost:8080/api/user/withdrawals",
+			},
+		},
+	}
+	handler := &Handler{
+		Mux: chi.NewMux(),
+		Cursor: &Cursor{
+			NewMock(),
+		},
+	}
+	handler.Post("/api/user/login", handler.Login)
+	handler.Get("/api/user/withdrawals", handler.GetWithdrawals)
+	handler.Post("/api/user/register", handler.RegisterUser)
+	ts := httptest.NewServer(handler)
+	handler.Cursor.SaveUserInfo(&UserInfo{
+		Username: "test",
+		Password: "test",
+	})
+	for _, withdrawal := range mockWithdrawals {
+		handler.Cursor.SaveWithdrawal("test", withdrawal)
+	}
+
+	defer ts.Close()
+
+	buff := bytes.NewBuffer([]byte{})
+	encoder := json.NewEncoder(buff)
+	encoder.Encode(&UserInfo{
+		Username: "test",
+		Password: "test",
+	})
+	request := httptest.NewRequest(http.MethodPost, "http://localhost:8080/api/user/login", buff)
+	request.Header.Add("Content-Type", "application/json")
+
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, request)
+
+	res := w.Result()
+
+	cookies := res.Cookies()
+
+	assert.Equal(t, res.StatusCode, 200)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			request := httptest.NewRequest(http.MethodGet, tt.args.url, nil)
+
+			w := httptest.NewRecorder()
+			if tt.name == "Test Positive GET - no withdrawals found" {
+				buff := bytes.NewBuffer([]byte{})
+				encoder := json.NewEncoder(buff)
+				encoder.Encode(&UserInfo{
+					Username: "test2",
+					Password: "test2",
+				})
+				request := httptest.NewRequest(http.MethodPost, "http://localhost:8080/api/user/register", buff)
+				request.Header.Add("Content-Type", "application/json")
+
+				w := httptest.NewRecorder()
+				handler.ServeHTTP(w, request)
+				res := w.Result()
+				cookies = res.Cookies()
+			}
+
+			request.AddCookie(cookies[0])
+			handler.ServeHTTP(w, request)
+			res := w.Result()
+
+			if res.StatusCode != tt.want.code {
+				t.Errorf("Expected status code %d, got %d", tt.want.code, w.Code)
+			}
+
+			receivedWithdrawals := []*Withdrawal{}
+			if err := json.NewDecoder(res.Body).Decode(&receivedWithdrawals); err != nil {
+				panic(err)
+			}
+			assert.Equal(t, tt.want.response, receivedWithdrawals)
 		})
 	}
 }
