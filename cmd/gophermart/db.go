@@ -8,10 +8,11 @@ type DbInterface interface {
 	SaveSession(string, interface{})
 	GetOrder(interface{}) (interface{}, error)
 	SaveOrder(interface{})
-	GetOrders() (interface{}, error)
+	GetOrders() ([]*Order, error)
 	GetUsernameByToken(token string) (string, error)
 	GetUserBalance(username string) (*Balance, error)
 	UpdateUserBalance(username string, newBalance *Balance) *Balance
+	GetUserTotalAccrual(username string) float64
 }
 
 type Cursor struct {

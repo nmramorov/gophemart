@@ -15,3 +15,13 @@ func ValidateLogin(input *UserInfo, existingInfo *UserInfo) error {
 	}
 	return ErrValidation
 }
+
+func ValidateOrder(cursor *Cursor, username string, orderToValidate string)  error {
+	userOrders, _ := cursor.GetOrders()
+	for _, order := range userOrders {
+		if orderToValidate == order.Number {
+			return nil
+		}
+	}
+	return ErrValidation
+}

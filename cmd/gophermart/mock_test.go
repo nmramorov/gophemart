@@ -77,7 +77,7 @@ func (mock *MockDb) SaveOrder(order interface{}) {
 	mock.orders = append(mock.orders, mockOrder)
 }
 
-func (mock *MockDb) GetOrders() (interface{}, error) {
+func (mock *MockDb) GetOrders() ([]*Order, error) {
 	if len(mock.orders) == 0 {
 		return nil, nil
 	}
@@ -103,4 +103,8 @@ func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
 func (mock *MockDb) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	mock.balance[username] = newBalance
 	return newBalance
+}
+
+func (mock *MockDb) GetUserTotalAccrual(username string) float64 {
+	return mock.balance[username].Current
 }

@@ -22,7 +22,12 @@ type Order struct {
 }
 
 type Balance struct {
-	User string `json:"-"`
-	Current float64 `json:"current"`
-	Withdrawn int `json:"withdrawn"`
+	User      string  `json:"-"`
+	Current   float64 `json:"current"`
+	Withdrawn float64 `json:"withdrawn"`
+}
+
+type WithdrawalPost struct {
+	Order string
+	Sum   float64
 }
