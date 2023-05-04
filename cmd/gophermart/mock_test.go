@@ -106,8 +106,8 @@ func (mock *MockDb) GetWithdrawals(username string) ([]*Withdrawal, error) {
 	return mock.withdrawals[username], nil
 }
 
-func (mock *MockDb) SaveWithdrawal(username string, withdrawal *Withdrawal) {
-	mock.withdrawals[username] = append(mock.withdrawals[username], withdrawal)
+func (mock *MockDb) SaveWithdrawal(withdrawal *Withdrawal) {
+	mock.withdrawals[withdrawal.User] = append(mock.withdrawals[withdrawal.User], withdrawal)
 }
 
 func (mock *MockDb) UpdateOrder(from *AccrualResponse) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"time"
 )
 
 func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
@@ -39,6 +40,12 @@ func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 	}
 	resultedWithdrawn := userBalance.Withdrawn + withrawal.Sum
 	// ToDo!:Add withdrawal to Withdrawal table
+	h.Cursor.SaveWithdrawal(&Withdrawal{
+		User:        username,
+		Order:       withrawal.Order,
+		Sum:         withrawal.Sum,
+		ProcessedAt: time.Now(),
+	})
 	_ = h.Cursor.UpdateUserBalance(username, &Balance{
 		User:      username,
 		Current:   resultedAccrual,

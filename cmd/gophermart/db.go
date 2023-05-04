@@ -13,7 +13,7 @@ type DbInterface interface {
 	GetUserBalance(string) (*Balance, error)
 	UpdateUserBalance(string, *Balance) *Balance
 	GetWithdrawals(string) ([]*Withdrawal, error)
-	SaveWithdrawal(string, *Withdrawal)
+	SaveWithdrawal(*Withdrawal)
 	UpdateOrder(*AccrualResponse)
 }
 

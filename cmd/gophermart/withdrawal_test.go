@@ -212,7 +212,9 @@ func TestGetWithdrawal(t *testing.T) {
 		Password: "test",
 	})
 	for _, withdrawal := range mockWithdrawals {
-		handler.Cursor.SaveWithdrawal("test", withdrawal)
+		withdrawal.User = "test"
+		handler.Cursor.SaveWithdrawal(withdrawal)
+		withdrawal.User = ""
 	}
 
 	defer ts.Close()
