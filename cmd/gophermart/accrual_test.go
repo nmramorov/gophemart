@@ -24,9 +24,9 @@ type MockAccrualHandler struct {
 
 func (mock *MockAccrualHandler) GetAccrual(rw http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
-	// mock.mu.Lock()
-	// defer mock.mu.Unlock()
+	// InfoLog.Println(number)
 	response, ok := mock.OrdersStorage[number]
+	// InfoLog.Println(response)
 	if !ok {
 		rw.WriteHeader(http.StatusNoContent)
 	}
@@ -77,10 +77,10 @@ func NewMockAccrualHandler() *MockAccrualHandler {
 	return handler
 }
 
-func initMockAccrual() *http.Server {
+func initMockAccrual(addr string) *http.Server {
 	handler := NewMockAccrualHandler()
 	server := &http.Server{
-		Addr:    "localhost:8080",
+		Addr:    addr,
 		Handler: handler,
 	}
 	handler.HandleFunc("/shutdown", func(w http.ResponseWriter, r *http.Request) {
@@ -94,20 +94,20 @@ func initMockAccrual() *http.Server {
 }
 
 func TestAccrualValidOrder(t *testing.T) {
-	defer httptest.NewRequest(http.MethodGet, "http://localhost:8080/shutdown", nil)
+	defer httptest.NewRequest(http.MethodGet, "http://localhost:8081/shutdown", nil)
 
 	go func() {
-		initMockAccrual()
+		initMockAccrual("localhost:8081")
 	}()
 	client := &http.Client{}
 
-	createOrder, _ := http.NewRequest(http.MethodPost, "http://localhost:8080/api/orders/1", nil)
+	createOrder, _ := http.NewRequest(http.MethodPost, "http://localhost:8081/api/orders/1", nil)
 	resp, err := client.Do(createOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
 	assert.Equal(t, 200, resp.StatusCode)
-	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/1", nil)
+	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/1", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
@@ -122,7 +122,7 @@ func TestAccrualValidOrder(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/1", nil)
+	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/1", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
@@ -137,7 +137,7 @@ func TestAccrualValidOrder(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/1", nil)
+	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/1", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
@@ -153,20 +153,20 @@ func TestAccrualValidOrder(t *testing.T) {
 }
 
 func TestAccrualInvalidOrder(t *testing.T) {
-	defer httptest.NewRequest(http.MethodGet, "http://localhost:8080/shutdown", nil)
+	defer httptest.NewRequest(http.MethodGet, "http://localhost:8081/shutdown", nil)
 
 	go func() {
-		initMockAccrual()
+		initMockAccrual("localhost:8081")
 	}()
 	client := &http.Client{}
 
-	createOrder, _ := http.NewRequest(http.MethodPost, "http://localhost:8080/api/orders/2", nil)
+	createOrder, _ := http.NewRequest(http.MethodPost, "http://localhost:8081/api/orders/2", nil)
 	resp, err := client.Do(createOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
 	assert.Equal(t, 200, resp.StatusCode)
-	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/2", nil)
+	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/2", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
@@ -181,7 +181,7 @@ func TestAccrualInvalidOrder(t *testing.T) {
 
 	time.Sleep(2 * time.Second)
 
-	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/2", nil)
+	getOrder, _ = http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/2", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
@@ -196,14 +196,14 @@ func TestAccrualInvalidOrder(t *testing.T) {
 }
 
 func TestAccrualNoSuchOrder(t *testing.T) {
-	defer httptest.NewRequest(http.MethodGet, "http://localhost:8080/shutdown", nil)
+	defer httptest.NewRequest(http.MethodGet, "http://localhost:8081/shutdown", nil)
 
 	go func() {
-		initMockAccrual()
+		initMockAccrual("localhost:8081")
 	}()
 	client := &http.Client{}
 
-	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8080/api/orders/3", nil)
+	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/3", nil)
 	resp, err := client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
