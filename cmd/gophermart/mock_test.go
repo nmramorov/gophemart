@@ -109,3 +109,13 @@ func (mock *MockDb) GetWithdrawals(username string) ([]*Withdrawal, error) {
 func (mock *MockDb) SaveWithdrawal(username string, withdrawal *Withdrawal) {
 	mock.withdrawals[username] = append(mock.withdrawals[username], withdrawal)
 }
+
+func (mock *MockDb) UpdateOrder(from *AccrualResponse) {
+	for _, order := range mock.orders {
+		if order.Number == from.Order {
+			order.Accrual = from.Accrual
+			order.Status = from.Status
+			break
+		}
+	}
+}

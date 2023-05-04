@@ -60,6 +60,8 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//ToDo: call Accrual Worker to get updates for specific order in goroutine
+
 	if order.Number == requestNumber {
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`order created already`))

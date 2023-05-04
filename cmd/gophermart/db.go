@@ -14,6 +14,7 @@ type DbInterface interface {
 	UpdateUserBalance(string, *Balance) *Balance
 	GetWithdrawals(string) ([]*Withdrawal, error)
 	SaveWithdrawal(string, *Withdrawal)
+	UpdateOrder(*AccrualResponse)
 }
 
 type Cursor struct {
