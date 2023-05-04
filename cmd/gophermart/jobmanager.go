@@ -72,12 +72,6 @@ func (jm *Jobmanager) AddJob(orderNumber string) {
 }
 
 func (jm *Jobmanager) ManageJobs(accrualUrl string) {
-	// for {
-	// 	select {
-	// 	case job := <-jm.Jobs:
-	// 		go jm.HandleJob(job)
-	// 	}
-	// }
 	for job := range jm.Jobs {
 		go jm.RunJob(job)
 	}

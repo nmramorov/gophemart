@@ -24,9 +24,7 @@ type MockAccrualHandler struct {
 
 func (mock *MockAccrualHandler) GetAccrual(rw http.ResponseWriter, r *http.Request) {
 	number := chi.URLParam(r, "number")
-	// InfoLog.Println(number)
 	response, ok := mock.OrdersStorage[number]
-	// InfoLog.Println(response)
 	if !ok {
 		rw.WriteHeader(http.StatusNoContent)
 	}
