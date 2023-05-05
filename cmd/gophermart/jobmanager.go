@@ -76,11 +76,11 @@ func (jm *Jobmanager) RunJob(job *Job) {
 			continue
 		}
 		// jm.mu.Lock()
-		jm.Cursor.UpdateOrder(response)
+		jm.Cursor.UpdateOrder(job.username, response)
 		// jm.mu.Unlock()
 	}
 	// jm.mu.Lock()
-	jm.Cursor.UpdateOrder(response)
+	jm.Cursor.UpdateOrder(job.username, response)
 	jm.Cursor.UpdateUserBalance(job.username, &Balance{
 		Current:   response.Accrual,
 		Withdrawn: 0.0,

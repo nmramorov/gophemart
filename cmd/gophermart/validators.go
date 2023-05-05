@@ -1,6 +1,5 @@
 package main
 
-
 func ValidateUserInfo(input *UserInfo) error {
 	if input.Password == "" || input.Username == "" {
 		return ErrValidation
@@ -18,7 +17,7 @@ func ValidateLogin(input *UserInfo, existingInfo *UserInfo) error {
 }
 
 func ValidateOrder(cursor *Cursor, username string, orderToValidate string) error {
-	userOrders, _ := cursor.GetOrders()
+	userOrders, _ := cursor.GetOrders(username)
 	for _, order := range userOrders {
 		if orderToValidate == order.Number {
 			return nil

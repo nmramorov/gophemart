@@ -7,15 +7,15 @@ type DBInterface interface {
 	Update()
 	SaveSession(string, *Session)
 	GetSession(string) (*Session, bool)
-	GetOrder(string) (*Order, error)
+	GetOrder(string, string) (*Order, error)
 	SaveOrder(*Order)
-	GetOrders() ([]*Order, error)
+	GetOrders(string) ([]*Order, error)
 	GetUsernameByToken(string) (string, error)
 	GetUserBalance(string) (*Balance, error)
 	UpdateUserBalance(string, *Balance) *Balance
 	GetWithdrawals(string) ([]*Withdrawal, error)
 	SaveWithdrawal(*Withdrawal)
-	UpdateOrder(*AccrualResponse)
+	UpdateOrder(string, *AccrualResponse)
 }
 
 type Cursor struct {

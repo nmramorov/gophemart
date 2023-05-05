@@ -8,7 +8,7 @@ type MockDB struct {
 	DBInterface
 	storage     map[string]string
 	sessions    map[string]Session
-	orders      []*Order
+	orders      map[string][]*Order
 	balance     map[string]*Balance
 	withdrawals map[string][]*Withdrawal
 }
@@ -22,7 +22,7 @@ func NewMock() *MockDB {
 	return &MockDB{
 		storage:     make(map[string]string),
 		sessions:    make(map[string]Session),
-		orders:      make([]*Order, 0),
+		orders:      make(map[string][]*Order),
 		balance:     make(map[string]*Balance),
 		withdrawals: make(map[string][]*Withdrawal),
 	}
@@ -60,10 +60,14 @@ func (mock *MockDB) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 	return nil, ErrValidation
 }
 
-func (mock *MockDB) GetOrder(number string) (*Order, error) {
-	for _, order := range mock.orders {
-		if order.Number == number {
-			return order, nil
+func (mock *MockDB) GetOrder(username string, number string) (*Order, error) {
+	for user, orders := range mock.orders {
+		if user == username {
+			for _, order := range orders {
+				if order.Number == number {
+					return order, nil
+				}
+			}
 		}
 	}
 
@@ -71,14 +75,15 @@ func (mock *MockDB) GetOrder(number string) (*Order, error) {
 }
 
 func (mock *MockDB) SaveOrder(order *Order) {
-	mock.orders = append(mock.orders, order)
+	mock.orders[order.Username] = append(mock.orders[order.Username], order)
+	// mock.orders = append(mock.orders, order)
 }
 
-func (mock *MockDB) GetOrders() ([]*Order, error) {
-	if len(mock.orders) == 0 {
+func (mock *MockDB) GetOrders(username string) ([]*Order, error) {
+	if len(mock.orders[username]) == 0 {
 		return nil, nil
 	}
-	return mock.orders, nil
+	return mock.orders[username], nil
 }
 
 func (mock *MockDB) GetUsernameByToken(token string) (string, error) {
@@ -110,8 +115,9 @@ func (mock *MockDB) SaveWithdrawal(withdrawal *Withdrawal) {
 	mock.withdrawals[withdrawal.User] = append(mock.withdrawals[withdrawal.User], withdrawal)
 }
 
-func (mock *MockDB) UpdateOrder(from *AccrualResponse) {
-	for _, order := range mock.orders {
+func (mock *MockDB) UpdateOrder(username string, from *AccrualResponse) {
+	orders := mock.orders[username]
+	for _, order := range orders {
 		if order.Number == from.Order {
 			if from.Status == "REGISTERED" {
 				order.Status = "PROCESSING"

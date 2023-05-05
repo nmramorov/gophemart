@@ -44,7 +44,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	order, err := GetOrderFromDB(h.Cursor, requestNumber)
+	order, err := GetOrderFromDB(h.Cursor, username, requestNumber)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
@@ -77,8 +77,8 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrderFromDB(cursor *Cursor, requestOrder string) (*Order, error) {
-	order, err := cursor.GetOrder(requestOrder)
+func GetOrderFromDB(cursor *Cursor, username string, requestOrder string) (*Order, error) {
+	order, err := cursor.GetOrder(username, requestOrder)
 	if order == nil {
 		return nil, err
 	}
@@ -88,7 +88,14 @@ func GetOrderFromDB(cursor *Cursor, requestOrder string) (*Order, error) {
 func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 	// h.Manager.mu.Lock()
 	// defer h.Manager.mu.Unlock()
-	orders, err := h.Cursor.GetOrders()
+	cookie, _ := r.Cookie("session_token")
+	sessionToken := cookie.Value
+	username, err := h.Cursor.GetUsernameByToken(sessionToken)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+
+	orders, err := h.Cursor.GetOrders(username)
 	// InfoLog.Println(&orders)
 	// defer h.Manager.mu.Unlock()
 	if err != nil {
