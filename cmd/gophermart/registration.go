@@ -23,7 +23,7 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sessionToken := uuid.NewString()
-	expiresAt := time.Now().Add(5 * time.Second)
+	expiresAt := time.Now().Add(600 * time.Second)
 
 	h.Cursor.SaveSession(sessionToken, &Session{
 		Username:  userInput.Username,
