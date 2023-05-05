@@ -134,7 +134,7 @@ func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 		return nil, row.Err()
 	}
 	foundOrder := &Order{}
-	err := row.Scan(&foundOrder.Number, &foundOrder.Username, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt)
+	err := row.Scan(&foundOrder.Username, &foundOrder.Number, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt)
 	if err == sql.ErrNoRows {
 		ErrorLog.Printf("No rows found for order %s and user %s", number, username)
 		return nil, nil
