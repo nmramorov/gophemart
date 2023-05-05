@@ -14,6 +14,9 @@ func (a *App) Run() {
 }
 
 func NewApp(config *Config) *App {
+	InfoLog.Printf("Application is running on addr %s", config.Address)
+	InfoLog.Printf("Accrual addr is %s", config.Accrual)
+	InfoLog.Printf("DB addr is %s", config.DatabaseURI)
 	handler := NewHandler(config.Accrual, GetCursor(config.DatabaseURI))
 	server := &http.Server{
 		Addr:    config.Address,
