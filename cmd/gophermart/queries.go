@@ -15,4 +15,5 @@ const (
 	GetSession            = `SELECT * FROM _sessions WHERE token=$1;`
 	GetAllOrders          = `SELECT * FROM orders;`
 	SaveUserInfo          = `INSERT INTO userinfo VALUES ($1, $2);`
+	SaveBalance           = `INSERT INTO balances VALUES ($1, $2, $3);`
 )

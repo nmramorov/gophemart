@@ -204,11 +204,24 @@ func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 	return foundBalance, nil
 }
 
+func (c *DBCursor) SaveUserBalance(username string, newBalance *Balance) *Balance {
+	_, err := c.DB.ExecContext(c.Context, SaveBalance, username, newBalance.Current, newBalance.Withdrawn)
+	if err != nil {
+		ErrorLog.Fatalf("error during saving balance for user %s: %e", username, err)
+	}
+	newBalance.User = username
+	return newBalance
+}
+
 func (c *DBCursor) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
+	if err == sql.ErrNoRows {
+		return c.SaveUserBalance(username, newBalance)
+	}
 	if err != nil {
 		ErrorLog.Fatalf("error during updating balance: %e", err)
 	}
+	InfoLog.Printf("Balance updated, Current: %f, Withdrawn: %f for user %s", newBalance.Current, newBalance.Withdrawn, username)
 	return newBalance
 }
 
