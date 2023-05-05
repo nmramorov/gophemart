@@ -21,7 +21,7 @@ func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
+	InfoLog.Println(withrawal)
 	err = ValidateOrder(h.Cursor, username, withrawal.Order)
 	if err != nil {
 		http.Error(rw, "invalid order number", http.StatusUnprocessableEntity)
