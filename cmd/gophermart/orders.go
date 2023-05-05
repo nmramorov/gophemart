@@ -51,6 +51,10 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if order == nil {
+		if order.Username != username {
+			http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
+			return
+		}
 		h.Cursor.SaveOrder(&Order{
 			Number:     requestNumber,
 			Username:   username,
