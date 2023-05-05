@@ -140,7 +140,7 @@ func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 		return nil, nil
 	}
 	if err != nil {
-		ErrorLog.Fatalf("error scanning order from db: %e", err)
+		ErrorLog.Fatalf("error scanning single order from db: %e", err)
 		return nil, err
 	}
 	return foundOrder, nil
@@ -312,7 +312,8 @@ func (c *DBCursor) GetAllOrders() []*Order {
 	for rows.Next() {
 		var o Order
 		if err = rows.Scan(&o.Username, &o.Number, &o.Status, &o.Accrual, &o.UploadedAt); err != nil {
-			ErrorLog.Fatalf("error scanning order from db: %e", err)
+			ErrorLog.Printf("error scanning order among orders from db: %e", err)
+			ErrorLog.Println(foundOrders)
 			return foundOrders
 		}
 		foundOrders = append(foundOrders, &o)
