@@ -118,7 +118,7 @@ func (c *DBCursor) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 		return nil, row.Err()
 	}
 	foundInfo := &UserInfo{}
-	err := row.Scan(foundInfo.Username, foundInfo.Password)
+	err := row.Scan(&foundInfo.Username, &foundInfo.Password)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning userinfo from db: %e", err)
 		return nil, err
@@ -133,7 +133,7 @@ func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 		return nil, row.Err()
 	}
 	foundOrder := &Order{}
-	err := row.Scan(foundOrder.Number, foundOrder.Status, foundOrder.Accrual, foundOrder.UploadedAt, foundOrder.Username)
+	err := row.Scan(&foundOrder.Number, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt, &foundOrder.Username)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning order from db: %e", err)
 		return nil, err
@@ -159,7 +159,7 @@ func (c *DBCursor) GetOrders(username string) ([]*Order, error) {
 		return nil, rows.Err()
 	}
 	foundOrders := []*Order{}
-	err = rows.Scan(foundOrders)
+	err = rows.Scan(&foundOrders)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning orders from db: %e", err)
 		return nil, err
@@ -174,7 +174,7 @@ func (c *DBCursor) GetUsernameByToken(token string) (string, error) {
 		return "", row.Err()
 	}
 	foundSession := &Session{}
-	err := row.Scan(foundSession.Username)
+	err := row.Scan(&foundSession.Username)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning session username from db: %e", err)
 		return "", err
@@ -189,7 +189,7 @@ func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 		return nil, row.Err()
 	}
 	foundBalance := &Balance{}
-	err := row.Scan(foundBalance.User, foundBalance.Current, foundBalance.Withdrawn)
+	err := row.Scan(&foundBalance.User, &foundBalance.Current, &foundBalance.Withdrawn)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning balance from db: %e", err)
 		return nil, err
@@ -217,7 +217,7 @@ func (c *DBCursor) GetWithdrawals(username string) ([]*Withdrawal, error) {
 		return nil, rows.Err()
 	}
 	foundWithdrawals := []*Withdrawal{}
-	err = rows.Scan(foundWithdrawals)
+	err = rows.Scan(&foundWithdrawals)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning withdrawals from db: %e", err)
 		return nil, err
@@ -273,7 +273,7 @@ func (c *DBCursor) GetAllOrders() []*Order {
 		return nil
 	}
 	foundOrders := []*Order{}
-	err = rows.Scan(foundOrders)
+	err = rows.Scan(&foundOrders)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning withdrawals from db: %e", err)
 		return nil
