@@ -11,7 +11,7 @@ const (
 	UpdateBalance  string = `UPDATE balances SET _current=$1, withdrawn=$2 WHERE username=$3;`
 	GetWithdrawals        = `SELECT * FROM withdrawal WHERE username=$1;`
 	SaveWithdrawal        = `INSERT INTO withdrawal VALUES ($1, $2, $3, $4);`
-	UpdateOrder           = `UPDATE orders SET _number=$1, _status=$2, accrual=$3 WHERE username=$4;`
+	UpdateOrder           = `UPDATE orders SET _status=$1, accrual=$2 WHERE username=$3 AND _number=$4;`
 	GetSession            = `SELECT * FROM _sessions WHERE token=$1;`
 	GetAllOrders          = `SELECT * FROM orders;`
 	SaveUserInfo          = `INSERT INTO userinfo VALUES ($1, $2);`

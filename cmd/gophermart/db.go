@@ -275,7 +275,7 @@ func (c *DBCursor) UpdateOrder(username string, from *AccrualResponse) {
 	} else {
 		status = from.Status
 	}
-	_, err := c.DB.ExecContext(c.Context, UpdateOrder, from.Order, status, from.Accrual, username)
+	_, err := c.DB.ExecContext(c.Context, UpdateOrder, status, from.Accrual, username, from.Order)
 	if err != nil {
 		ErrorLog.Fatalf("error during updating order: %e", err)
 	}
