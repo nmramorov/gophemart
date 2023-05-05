@@ -44,6 +44,9 @@ func GzipHandle(next http.Handler) http.Handler {
 
 func (h *Handler) CookieHandle(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.Contains(r.URL.Path, "/api/user/register") || strings.Contains(r.URL.Path, "/api/user/login") {
+			next.ServeHTTP(w, r)
+		}
 		c, err := r.Cookie("session_token")
 		if err != nil {
 			if err == http.ErrNoCookie {

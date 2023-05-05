@@ -19,6 +19,7 @@ func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	dbData, err := h.Cursor.GetUserInfo(userInput)
+
 	if err != nil {
 		http.Error(rw, "wrong password/username", http.StatusUnauthorized)
 		return
@@ -33,7 +34,7 @@ func (h *Handler) Login(rw http.ResponseWriter, r *http.Request) {
 	h.Cursor.SaveSession(sessionToken, &Session{
 		Username:  userInput.Username,
 		ExpiresAt: expiresAt,
-		Token: sessionToken,
+		Token:     sessionToken,
 	})
 
 	http.SetCookie(rw, &http.Cookie{

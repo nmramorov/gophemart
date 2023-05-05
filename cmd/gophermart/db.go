@@ -21,3 +21,7 @@ type DbInterface interface {
 type Cursor struct {
 	DbInterface
 }
+
+func GetCursor(url string) *Cursor {
+	return &Cursor{NewMock()}
+}
