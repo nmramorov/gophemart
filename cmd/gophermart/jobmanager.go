@@ -38,6 +38,7 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 	if resp.StatusCode == 429 {
 		return nil, resp.StatusCode
 	}
+	InfoLog.Println(resp)
 	defer resp.Body.Close()
 	result := &AccrualResponse{}
 	InfoLog.Println(resp.Body)
