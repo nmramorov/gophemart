@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"net/http"
 
 	// "sync"
 	"time"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type Job struct {
@@ -17,7 +17,7 @@ type Jobmanager struct {
 	Jobs       chan *Job
 	Cursor     *Cursor
 	// mu         sync.Mutex
-	client *http.Client
+	client *resty.Client
 }
 
 func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
@@ -25,32 +25,38 @@ func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
 		AccrualURL: accrualURL,
 		Jobs:       make(chan *Job),
 		Cursor:     cursor,
-		client:     &http.Client{},
+		client:     resty.New().SetBaseURL(accrualURL),
 	}
 }
 
 func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, int) {
-	InfoLog.Printf("calling accrual to get order %s by %s", number, url+"/api/orders/"+number)
-	getOrder, _ := http.NewRequest(http.MethodGet, url+"/api/orders/"+number, nil)
-	resp, err := jm.client.Do(getOrder)
+	// InfoLog.Printf("calling accrual to get order %s by %s", number, url+"/api/orders/"+number)
+	// getOrder, _ := http.NewRequest(http.MethodGet, url+"/api/orders/"+number, nil)
+	// resp, err := jm.client.Do(getOrder)
+	acc := AccrualResponse{}
+	req := jm.client.R().
+		SetResult(&acc).
+		SetPathParam("number", number)
+
+	resp, err := req.Get("/api/orders/{number}")
 	if err != nil {
 		ErrorLog.Fatalf("Error getting order from accrual: %e", err)
 	}
-	InfoLog.Printf("Accrual GET status code: %d", resp.StatusCode)
-	if resp.StatusCode == 429 {
-		return nil, resp.StatusCode
+	InfoLog.Printf("Accrual GET status code: %d", resp.StatusCode())
+	if resp.StatusCode() == 429 {
+		return nil, resp.StatusCode()
 	}
-	if resp.StatusCode == 204 {
+	if resp.StatusCode() == 204 {
 		return &AccrualResponse{Status: "NEW"}, 204
 	}
 
-	defer resp.Body.Close()
-	result := &AccrualResponse{}
-	// InfoLog.Println(resp.Body)
-	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-		ErrorLog.Fatalf("Error decoding accrual response: %e", err)
-	}
-	return result, resp.StatusCode
+	// result := &AccrualResponse{}
+	// // InfoLog.Println(resp.Body)
+	// if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
+	// 	ErrorLog.Fatalf("Error decoding accrual response: %e", err)
+	// }
+	// return result, resp.StatusCode
+	return &acc, resp.StatusCode()
 }
 
 func (jm *Jobmanager) RunJob(job *Job) {
