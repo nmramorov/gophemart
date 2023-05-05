@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+
 	// "sync"
 	"time"
 )
@@ -16,7 +17,7 @@ type Jobmanager struct {
 	Jobs       chan *Job
 	Cursor     *Cursor
 	// mu         sync.Mutex
-	client     *http.Client
+	client *http.Client
 }
 
 func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
@@ -38,13 +39,15 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 	if resp.StatusCode == 429 {
 		return nil, resp.StatusCode
 	}
+	if resp.StatusCode == 204 {
+		return &AccrualResponse{Status: "NEW"}, 204
+	}
 	// InfoLog.Println(resp)
 	defer resp.Body.Close()
 	result := &AccrualResponse{}
 	// InfoLog.Println(resp.Body)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-		ErrorLog.Printf("Error decoding accrual response: %e", err)
-		return &AccrualResponse{Status: "NEW"}, 500
+		ErrorLog.Fatalf("Error decoding accrual response: %e", err)
 	}
 	return result, resp.StatusCode
 }
@@ -77,6 +80,7 @@ func (jm *Jobmanager) AddJob(orderNumber string) {
 
 func (jm *Jobmanager) ManageJobs(accrualURL string) {
 	for job := range jm.Jobs {
+		InfoLog.Printf("Running job for order %s", job.orderNumber)
 		go jm.RunJob(job)
 	}
 	close(jm.Jobs)

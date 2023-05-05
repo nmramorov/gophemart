@@ -81,7 +81,7 @@ func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 	// h.Manager.mu.Lock()
 	// defer h.Manager.mu.Unlock()
 	orders, err := h.Cursor.GetOrders()
-	InfoLog.Println(&orders)
+	// InfoLog.Println(&orders)
 	// defer h.Manager.mu.Unlock()
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
@@ -90,6 +90,7 @@ func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNoContent)
 		rw.Write([]byte(`no orders found`))
 	} else {
+		InfoLog.Println("Writing orders to JSON")
 		body := bytes.NewBuffer([]byte{})
 		encoder := json.NewEncoder(body)
 		encoder.Encode(&orders)
