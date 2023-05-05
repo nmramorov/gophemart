@@ -10,6 +10,7 @@ import (
 
 type Job struct {
 	orderNumber string
+	username    string
 }
 
 type Jobmanager struct {
@@ -80,12 +81,16 @@ func (jm *Jobmanager) RunJob(job *Job) {
 	}
 	// jm.mu.Lock()
 	jm.Cursor.UpdateOrder(response)
+	jm.Cursor.UpdateUserBalance(job.username, &Balance{
+		Current:   response.Accrual,
+		Withdrawn: 0.0,
+	})
 	// jm.mu.Unlock()
 	InfoLog.Println("Job finished")
 }
 
-func (jm *Jobmanager) AddJob(orderNumber string) {
-	jm.Jobs <- &Job{orderNumber: orderNumber}
+func (jm *Jobmanager) AddJob(orderNumber string, username string) {
+	jm.Jobs <- &Job{orderNumber: orderNumber, username: username}
 }
 
 func (jm *Jobmanager) ManageJobs(accrualURL string) {

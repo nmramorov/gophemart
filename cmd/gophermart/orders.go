@@ -57,7 +57,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 			UploadedAt: time.Now(),
 			Status:     "NEW",
 		})
-		h.Manager.AddJob(requestNumber)
+		h.Manager.AddJob(requestNumber, username)
 		rw.WriteHeader(http.StatusAccepted)
 		rw.Write([]byte(`new order created`))
 		return

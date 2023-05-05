@@ -72,7 +72,7 @@ func TestJobmanager(t *testing.T) {
 		}
 		defer resp.Body.Close()
 		assert.Equal(t, 200, resp.StatusCode)
-		handler.Manager.AddJob(order)
+		handler.Manager.AddJob("test", order)
 	}
 	time.Sleep(2 * time.Second)
 	request = httptest.NewRequest(http.MethodGet, "http://localhost:8080/api/user/orders", nil)
