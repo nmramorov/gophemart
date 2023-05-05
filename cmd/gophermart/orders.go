@@ -61,6 +61,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	//ToDo: call Accrual Worker to get updates for specific order in goroutine
+	h.Manager.AddJob(order.Number)
 
 	if order.Number == requestNumber {
 		rw.WriteHeader(http.StatusOK)
