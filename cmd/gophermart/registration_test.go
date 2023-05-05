@@ -11,14 +11,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-
 func TestRegistration(t *testing.T) {
 	type want struct {
 		code     int
 		response string
 	}
 	type userinfo struct {
-		Username string `json:"username"`
+		Username string `json:"login"`
 		Password string `json:"password"`
 	}
 	type arguments struct {
@@ -123,4 +122,3 @@ func TestRegistration(t *testing.T) {
 		})
 	}
 }
-

@@ -17,7 +17,7 @@ func TestAuthentication(t *testing.T) {
 		response string
 	}
 	type userinfo struct {
-		Username string `json:"username"`
+		Username string `json:"login"`
 		Password string `json:"password"`
 	}
 	type arguments struct {
