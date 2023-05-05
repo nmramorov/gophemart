@@ -10,9 +10,9 @@ import (
 
 func TestAgentCLI(t *testing.T) {
 	os.Args = []string{"main.go", "-a", "localhost:4444", "-d=11s", "-r=5m"}
-	var address = flag.String("a", "localhost:8080", "server address")
-	var accrual = flag.String("r", "10s", "accrual address")
-	var database = flag.String("d", "2s", "database address")
+	var address = flag.String("a", "", "server address")
+	var accrual = flag.String("r", "", "accrual address")
+	var database = flag.String("d", "", "database address")
 	flag.Parse()
 
 	args := &CLIOptions{
