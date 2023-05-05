@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/theplant/luhn"
 )
 
 func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
@@ -32,7 +34,12 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 
 	requestNumber := string(body)
 
-	if _, err := strconv.Atoi(requestNumber); err != nil {
+	n, err := strconv.Atoi(requestNumber)
+	if err != nil {
+		http.Error(rw, "wrong number format", http.StatusUnprocessableEntity)
+		return
+	}
+	if !luhn.Valid(n) {
 		http.Error(rw, "wrong number format", http.StatusUnprocessableEntity)
 		return
 	}
