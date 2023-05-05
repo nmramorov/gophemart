@@ -7,13 +7,15 @@ import (
 type Handler struct {
 	*chi.Mux
 	Cursor  *Cursor
+	DBCursor *Cursor
 	Manager *Jobmanager
 }
 
-func NewHandler(accrualURL string, cursor *Cursor) *Handler {
+func NewHandler(accrualURL string, cursor *Cursor, dbcursor *Cursor) *Handler {
 	handler := &Handler{
 		Mux:     chi.NewMux(),
 		Cursor:  cursor,
+		DBCursor: dbcursor,
 		Manager: NewJobmanager(cursor, accrualURL),
 	}
 	handler.Use(GzipHandle)
