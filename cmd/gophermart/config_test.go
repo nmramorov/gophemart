@@ -44,8 +44,8 @@ func TestConfigBothNotProvided(t *testing.T) {
 	flags := NewCliOptions()
 	config := NewConfig(flags, envs)
 	assert.Equal(t, &Config{
-		Address:     "127.0.0.1:8080",
-		DatabaseURI: "127.0.0.1:5432",
-		Accrual:     "127.0.0.1:8081",
+		Address:     "localhost:8080",
+		DatabaseURI: "localhost:5432",
+		Accrual:     "localhost:8081",
 	}, config)
 }

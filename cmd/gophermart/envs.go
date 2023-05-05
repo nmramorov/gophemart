@@ -5,9 +5,9 @@ import (
 )
 
 type EnvConfig struct {
-	Address     string `env:"RUN_ADDRESS,required" envDefault:"127.0.0.1:8080"`
-	DatabaseURI string `env:"DATABASE_URI,required" envDefault:"127.0.0.1:5432"`
-	Accrual     string `env:"ACCRUAL_SYSTEM_ADDRESS,required" envDefault:"127.0.0.1:8081"`
+	Address     string `env:"RUN_ADDRESS,required" envDefault:"localhost:8080"`
+	DatabaseURI string `env:"DATABASE_URI,required" envDefault:"localhost:5432"`
+	Accrual     string `env:"ACCRUAL_SYSTEM_ADDRESS,required" envDefault:"localhost:8081"`
 }
 
 func NewEnvConfig() (*EnvConfig, error) {
