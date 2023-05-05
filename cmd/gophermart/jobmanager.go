@@ -57,7 +57,10 @@ func (jm *Jobmanager) RunJob(job *Job) {
 	if statusCode == 429 {
 		time.Sleep(time.Second)
 	}
-
+	if statusCode == 204 {
+		InfoLog.Printf("Order %s not registered", job.orderNumber)
+		return
+	}
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
 		response, statusCode = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 		if statusCode == 429 {

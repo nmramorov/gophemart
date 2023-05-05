@@ -113,6 +113,10 @@ func (mock *MockDB) SaveWithdrawal(withdrawal *Withdrawal) {
 func (mock *MockDB) UpdateOrder(from *AccrualResponse) {
 	for _, order := range mock.orders {
 		if order.Number == from.Order {
+			if from.Status == "REGISTERED" {
+				order.Status = "PROCESSING"
+				break
+			}
 			order.Accrual = from.Accrual
 			order.Status = from.Status
 			break
