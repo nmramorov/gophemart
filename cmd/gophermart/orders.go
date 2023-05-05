@@ -59,6 +59,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		}
 		err := ValidateOrder(h.Cursor, newOrder)
 		if err != nil {
+			ErrorLog.Printf("Validation error for new order %s", newOrder.Number)
 			http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
 			return
 		}
@@ -70,6 +71,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if order.Username != username {
+		ErrorLog.Printf("Validation error for order %s", order.Number)
 		http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
 		return
 	}
