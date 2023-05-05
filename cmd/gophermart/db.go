@@ -8,6 +8,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 type DBInterface interface {
@@ -58,7 +59,7 @@ func RunMigrations(databaseURL string) {
 }
 
 func NewCursor(DBURL string) *DBCursor {
-	db, err := sql.Open(DBURL, "pgx")
+	db, err := sql.Open("pgx", DBURL)
 	if err != nil {
 		ErrorLog.Printf("Unable to connect to database: %v\n", err)
 		return nil
