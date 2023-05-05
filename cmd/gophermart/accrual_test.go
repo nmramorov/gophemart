@@ -213,5 +213,6 @@ func TestAccrualNoSuchOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 204, resp.StatusCode)
 }

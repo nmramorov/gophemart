@@ -120,6 +120,7 @@ func TestPostOrders(t *testing.T) {
 	handler.ServeHTTP(w, request)
 
 	res := w.Result()
+	defer res.Body.Close()
 
 	cookies := res.Cookies()
 
@@ -146,6 +147,7 @@ func TestPostOrders(t *testing.T) {
 				w := httptest.NewRecorder()
 				handler.ServeHTTP(w, request)
 				res := w.Result()
+				defer res.Body.Close()
 				cookies = res.Cookies()
 			}
 			request.AddCookie(cookies[0])
@@ -259,7 +261,7 @@ func TestGetOrders(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, tt.want.response, string(resBody)[:len(string(resBody)) - 1])
+			assert.Equal(t, tt.want.response, string(resBody)[:len(string(resBody))-1])
 		})
 	}
 }

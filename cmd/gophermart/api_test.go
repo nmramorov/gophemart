@@ -37,6 +37,7 @@ func TestCookies(t *testing.T) {
 
 	handler.ServeHTTP(w, request)
 	res := w.Result()
+	defer res.Body.Close()
 
 	assert.Equal(t, res.StatusCode, 200)
 }
