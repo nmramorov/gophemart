@@ -41,7 +41,8 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 	result := &AccrualResponse{}
 	InfoLog.Println(resp.Body)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-		ErrorLog.Fatalf("Error decoding accrual response: %e", err)
+		ErrorLog.Printf("Error decoding accrual response: %e", err)
+		return nil, 500
 	}
 	return result, resp.StatusCode
 }
