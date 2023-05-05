@@ -1,6 +1,6 @@
 package main
 
-type DbInterface interface {
+type DBInterface interface {
 	Connect()
 	SaveUserInfo(*UserInfo) bool
 	GetUserInfo(*UserInfo) (*UserInfo, error)
@@ -19,7 +19,7 @@ type DbInterface interface {
 }
 
 type Cursor struct {
-	DbInterface
+	DBInterface
 }
 
 func GetCursor(url string) *Cursor {

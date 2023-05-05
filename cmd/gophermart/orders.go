@@ -37,7 +37,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	order, err := GetOrderFromDb(h.Cursor, requestNumber)
+	order, err := GetOrderFromDB(h.Cursor, requestNumber)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
@@ -68,7 +68,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetOrderFromDb(cursor *Cursor, requestOrder string) (*Order, error) {
+func GetOrderFromDB(cursor *Cursor, requestOrder string) (*Order, error) {
 	order, err := cursor.GetOrder(requestOrder)
 	if order == nil {
 		return nil, err

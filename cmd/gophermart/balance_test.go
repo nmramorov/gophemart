@@ -71,6 +71,7 @@ func TestBalanceGet(t *testing.T) {
 	handler.ServeHTTP(w, request)
 
 	res := w.Result()
+	defer res.Body.Close()
 
 	cookies := res.Cookies()
 

@@ -2,7 +2,6 @@ package main
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -75,6 +74,6 @@ func (h *Handler) CookieHandle(next http.Handler) http.Handler {
 		}
 
 		// If the session is valid, return the welcome message to the user
-		w.Write([]byte(fmt.Sprintf("Welcome %s!", userSession.Username)))
+		next.ServeHTTP(w, r)
 	})
 }

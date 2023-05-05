@@ -12,16 +12,16 @@ type Job struct {
 }
 
 type Jobmanager struct {
-	AccrualUrl string
+	AccrualURL string
 	Jobs       chan *Job
 	Cursor     *Cursor
 	mu         sync.Mutex
 	client     *http.Client
 }
 
-func NewJobmanager(cursor *Cursor, accrualUrl string) *Jobmanager {
+func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
 	return &Jobmanager{
-		AccrualUrl: accrualUrl,
+		AccrualURL: accrualURL,
 		Jobs:       make(chan *Job),
 		Cursor:     cursor,
 		client:     &http.Client{},
@@ -46,13 +46,13 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 }
 
 func (jm *Jobmanager) RunJob(job *Job) {
-	response, statusCode := jm.AskAccrual(jm.AccrualUrl, job.orderNumber)
+	response, statusCode := jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 	if statusCode == 429 {
 		time.Sleep(2 * time.Second)
 	}
 
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
-		response, statusCode = jm.AskAccrual(jm.AccrualUrl, job.orderNumber)
+		response, statusCode = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 		if statusCode == 429 {
 			time.Sleep(2 * time.Second)
 			continue
@@ -71,7 +71,7 @@ func (jm *Jobmanager) AddJob(orderNumber string) {
 	jm.Jobs <- &Job{orderNumber: orderNumber}
 }
 
-func (jm *Jobmanager) ManageJobs(accrualUrl string) {
+func (jm *Jobmanager) ManageJobs(accrualURL string) {
 	for job := range jm.Jobs {
 		go jm.RunJob(job)
 	}

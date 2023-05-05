@@ -113,6 +113,7 @@ func TestWithdrawal(t *testing.T) {
 	handler.ServeHTTP(w, request)
 
 	res := w.Result()
+	defer res.Body.Close()
 
 	cookies := res.Cookies()
 
@@ -233,6 +234,7 @@ func TestGetWithdrawal(t *testing.T) {
 	handler.ServeHTTP(w, request)
 
 	res := w.Result()
+	defer res.Body.Close()
 
 	cookies := res.Cookies()
 
@@ -256,12 +258,14 @@ func TestGetWithdrawal(t *testing.T) {
 				w := httptest.NewRecorder()
 				handler.ServeHTTP(w, request)
 				res := w.Result()
+				defer res.Body.Close()
 				cookies = res.Cookies()
 			}
 
 			request.AddCookie(cookies[0])
 			handler.ServeHTTP(w, request)
 			res := w.Result()
+			defer res.Body.Close()
 
 			if res.StatusCode != tt.want.code {
 				t.Errorf("Expected status code %d, got %d", tt.want.code, w.Code)

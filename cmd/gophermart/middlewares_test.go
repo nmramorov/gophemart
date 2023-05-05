@@ -19,5 +19,6 @@ func TestCookiesMiddleware(t *testing.T) {
 
 	handler.ServeHTTP(w, request)
 	res := w.Result()
+	defer res.Body.Close()
 	assert.Equal(t, 401, res.StatusCode)
 }

@@ -4,8 +4,8 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type MockDb struct {
-	DbInterface
+type MockDB struct {
+	DBInterface
 	storage     map[string]string
 	sessions    map[string]Session
 	orders      []*Order
@@ -15,11 +15,11 @@ type MockDb struct {
 
 type TestHandler struct {
 	*chi.Mux
-	DbApi *MockDb
+	DBAPI *MockDB
 }
 
-func NewMock() *MockDb {
-	return &MockDb{
+func NewMock() *MockDB {
+	return &MockDB{
 		storage:     make(map[string]string),
 		sessions:    make(map[string]Session),
 		orders:      make([]*Order, 0),
@@ -28,15 +28,15 @@ func NewMock() *MockDb {
 	}
 }
 
-func (mock *MockDb) Connect() {}
+func (mock *MockDB) Connect() {}
 
-func (mock *MockDb) Update() {}
+func (mock *MockDB) Update() {}
 
-func (mock *MockDb) SaveSession(id string, session *Session) {
+func (mock *MockDB) SaveSession(id string, session *Session) {
 	mock.sessions[id] = *session
 }
 
-func (mock *MockDb) SaveUserInfo(info *UserInfo) bool {
+func (mock *MockDB) SaveUserInfo(info *UserInfo) bool {
 
 	for k := range mock.storage {
 		if k == info.Username {
@@ -48,7 +48,7 @@ func (mock *MockDb) SaveUserInfo(info *UserInfo) bool {
 	return true
 }
 
-func (mock *MockDb) GetUserInfo(info *UserInfo) (*UserInfo, error) {
+func (mock *MockDB) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 	for k, v := range mock.storage {
 		if k == info.Username {
 			return &UserInfo{
@@ -60,7 +60,7 @@ func (mock *MockDb) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 	return nil, ErrValidation
 }
 
-func (mock *MockDb) GetOrder(number string) (*Order, error) {
+func (mock *MockDB) GetOrder(number string) (*Order, error) {
 	for _, order := range mock.orders {
 		if order.Number == number {
 			return order, nil
@@ -70,18 +70,18 @@ func (mock *MockDb) GetOrder(number string) (*Order, error) {
 	return nil, nil
 }
 
-func (mock *MockDb) SaveOrder(order *Order) {
+func (mock *MockDB) SaveOrder(order *Order) {
 	mock.orders = append(mock.orders, order)
 }
 
-func (mock *MockDb) GetOrders() ([]*Order, error) {
+func (mock *MockDB) GetOrders() ([]*Order, error) {
 	if len(mock.orders) == 0 {
 		return nil, nil
 	}
 	return mock.orders, nil
 }
 
-func (mock *MockDb) GetUsernameByToken(token string) (string, error) {
+func (mock *MockDB) GetUsernameByToken(token string) (string, error) {
 	session, ok := mock.sessions[token]
 	if !ok {
 		return "", ErrValidation
@@ -89,7 +89,7 @@ func (mock *MockDb) GetUsernameByToken(token string) (string, error) {
 	return session.Username, nil
 }
 
-func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
+func (mock *MockDB) GetUserBalance(username string) (*Balance, error) {
 	balance, ok := mock.balance[username]
 	if !ok {
 		return nil, ErrValidation
@@ -97,20 +97,20 @@ func (mock *MockDb) GetUserBalance(username string) (*Balance, error) {
 	return balance, nil
 }
 
-func (mock *MockDb) UpdateUserBalance(username string, newBalance *Balance) *Balance {
+func (mock *MockDB) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	mock.balance[username] = newBalance
 	return newBalance
 }
 
-func (mock *MockDb) GetWithdrawals(username string) ([]*Withdrawal, error) {
+func (mock *MockDB) GetWithdrawals(username string) ([]*Withdrawal, error) {
 	return mock.withdrawals[username], nil
 }
 
-func (mock *MockDb) SaveWithdrawal(withdrawal *Withdrawal) {
+func (mock *MockDB) SaveWithdrawal(withdrawal *Withdrawal) {
 	mock.withdrawals[withdrawal.User] = append(mock.withdrawals[withdrawal.User], withdrawal)
 }
 
-func (mock *MockDb) UpdateOrder(from *AccrualResponse) {
+func (mock *MockDB) UpdateOrder(from *AccrualResponse) {
 	for _, order := range mock.orders {
 		if order.Number == from.Order {
 			order.Accrual = from.Accrual
@@ -120,7 +120,7 @@ func (mock *MockDb) UpdateOrder(from *AccrualResponse) {
 	}
 }
 
-func (mock *MockDb) GetSession(token string) (*Session, bool) {
+func (mock *MockDB) GetSession(token string) (*Session, bool) {
 	session, ok := mock.sessions[token]
 	if !ok {
 		return nil, false

@@ -34,6 +34,7 @@ func TestApp(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatalf("Error with login response: %e", err)
 	}
+	defer response.Body.Close()
 
 	assert.Equal(t, 401, response.StatusCode)
 
@@ -51,5 +52,6 @@ func TestApp(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatalf("Error with registration response: %e", err)
 	}
+	defer response.Body.Close()
 	assert.Equal(t, 200, response.StatusCode)
 }

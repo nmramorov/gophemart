@@ -104,12 +104,14 @@ func TestAccrualValidOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/1", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	result := &AccrualResponse{}
 	json.NewDecoder(resp.Body).Decode(result)
@@ -125,6 +127,7 @@ func TestAccrualValidOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	result = &AccrualResponse{}
 	json.NewDecoder(resp.Body).Decode(result)
@@ -140,6 +143,7 @@ func TestAccrualValidOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	result = &AccrualResponse{}
 	json.NewDecoder(resp.Body).Decode(result)
@@ -163,12 +167,14 @@ func TestAccrualInvalidOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	getOrder, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/orders/2", nil)
 	resp, err = client.Do(getOrder)
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	result := &AccrualResponse{}
 	json.NewDecoder(resp.Body).Decode(result)
@@ -184,6 +190,7 @@ func TestAccrualInvalidOrder(t *testing.T) {
 	if err != nil {
 		ErrorLog.Fatal(err)
 	}
+	defer resp.Body.Close()
 	assert.Equal(t, 200, resp.StatusCode)
 	result = &AccrualResponse{}
 	json.NewDecoder(resp.Body).Decode(result)

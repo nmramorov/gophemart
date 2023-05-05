@@ -10,11 +10,11 @@ type Handler struct {
 	Manager *Jobmanager
 }
 
-func NewHandler(accrualUrl string, cursor *Cursor) *Handler {
+func NewHandler(accrualURL string, cursor *Cursor) *Handler {
 	handler := &Handler{
 		Mux:     chi.NewMux(),
 		Cursor:  cursor,
-		Manager: NewJobmanager(cursor, accrualUrl),
+		Manager: NewJobmanager(cursor, accrualURL),
 	}
 	handler.Use(GzipHandle)
 	handler.Use(handler.CookieHandle)

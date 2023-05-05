@@ -45,6 +45,7 @@ func TestJobmanager(t *testing.T) {
 	handler.ServeHTTP(w, request)
 
 	res := w.Result()
+	defer res.Body.Close()
 
 	cookies := res.Cookies()
 
@@ -60,6 +61,7 @@ func TestJobmanager(t *testing.T) {
 		w := httptest.NewRecorder()
 		handler.ServeHTTP(w, createOrder)
 		res := w.Result()
+		defer res.Body.Close()
 
 		assert.Equal(t, 202, res.StatusCode)
 
@@ -68,6 +70,7 @@ func TestJobmanager(t *testing.T) {
 		if err != nil {
 			ErrorLog.Fatal(err)
 		}
+		defer resp.Body.Close()
 		assert.Equal(t, 200, resp.StatusCode)
 		handler.Manager.AddJob(order)
 	}
@@ -77,6 +80,7 @@ func TestJobmanager(t *testing.T) {
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, request)
 	response := w.Result()
+	defer response.Body.Close()
 
 	assert.Equal(t, 200, response.StatusCode)
 	result := []*Order{}
@@ -97,6 +101,7 @@ func TestJobmanager(t *testing.T) {
 	w = httptest.NewRecorder()
 	handler.ServeHTTP(w, request)
 	response = w.Result()
+	defer response.Body.Close()
 
 	assert.Equal(t, 200, response.StatusCode)
 	result = []*Order{}
