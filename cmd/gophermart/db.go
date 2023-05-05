@@ -26,6 +26,7 @@ type DBInterface interface {
 	UpdateUserBalance(string, *Balance) *Balance
 	GetWithdrawals(string) ([]*Withdrawal, error)
 	SaveWithdrawal(*Withdrawal)
+	SaveUserBalance(string, *Balance) *Balance
 	UpdateOrder(string, *AccrualResponse)
 	GetAllOrders() []*Order
 }
@@ -220,13 +221,13 @@ func (c *DBCursor) SaveUserBalance(username string, newBalance *Balance) *Balanc
 
 func (c *DBCursor) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
-	if err == sql.ErrNoRows {
-		c.SaveUserBalance(username, newBalance)
-		_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
-		if err != nil {
-			ErrorLog.Fatalf("error during updating balance after saving: %e", err)
-		}
-	}
+	// if err == sql.ErrNoRows {
+	// 	c.SaveUserBalance(username, newBalance)
+	// 	_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
+	// 	if err != nil {
+	// 		ErrorLog.Fatalf("error during updating balance after saving: %e", err)
+	// 	}
+	// }
 	if err != nil {
 		ErrorLog.Fatalf("error during updating balance: %e", err)
 	}

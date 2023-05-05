@@ -28,7 +28,12 @@ func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 	h.Cursor.SaveSession(sessionToken, &Session{
 		Username:  userInput.Username,
 		ExpiresAt: expiresAt,
-		Token: sessionToken,
+		Token:     sessionToken,
+	})
+	h.Cursor.SaveUserBalance(userInput.Username, &Balance{
+		User:      userInput.Username,
+		Current:   0.0,
+		Withdrawn: 0.0,
 	})
 
 	http.SetCookie(rw, &http.Cookie{
