@@ -283,10 +283,13 @@ func (c *DBCursor) GetAllOrders() []*Order {
 		return nil
 	}
 	foundOrders := []*Order{}
-	err = rows.Scan(&foundOrders)
-	if err != nil {
-		ErrorLog.Fatalf("error scanning withdrawals from db: %e", err)
-		return nil
+	for rows.Next() {
+		var o Order
+		if err = rows.Scan(&o.Username, o.Number, o.Status, o.Accrual, o.UploadedAt); err != nil {
+			ErrorLog.Fatalf("error scanning order from db: %e", err)
+			return foundOrders
+		}
+		foundOrders = append(foundOrders, &o)
 	}
 	return foundOrders
 }
