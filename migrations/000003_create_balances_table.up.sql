@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS balances (
+    user VARCHAR(50) NOT NULL UNIQUE,
+    current FLOAT NOT NULL DEFAULT 0.0,
+    withdrawn FLOAT NOT NULL DEFAULT 0.0
+);
