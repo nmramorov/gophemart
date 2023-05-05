@@ -197,6 +197,13 @@ func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 	}
 	foundBalance := &Balance{}
 	err := row.Scan(&foundBalance.User, &foundBalance.Current, &foundBalance.Withdrawn)
+	if err == sql.ErrNoRows {
+		return &Balance{
+			User:      username,
+			Withdrawn: 0.0,
+			Current:   0.0,
+		}, nil
+	}
 	if err != nil {
 		ErrorLog.Fatalf("error scanning balance from db: %e", err)
 		return nil, err
