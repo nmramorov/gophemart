@@ -30,7 +30,7 @@ func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
 }
 
 func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, int) {
-	// InfoLog.Printf("calling accrual to get order %s by %s", number, url)
+	InfoLog.Printf("calling accrual to get order %s by %s", number, url)
 	getOrder, _ := http.NewRequest(http.MethodGet, url+"/api/orders/"+number, nil)
 	resp, err := jm.client.Do(getOrder)
 	if err != nil {
@@ -57,10 +57,10 @@ func (jm *Jobmanager) RunJob(job *Job) {
 	if statusCode == 429 {
 		time.Sleep(time.Second)
 	}
-	if statusCode == 204 {
-		InfoLog.Printf("Order %s not registered", job.orderNumber)
-		return
-	}
+	// if statusCode == 204 {
+	// 	InfoLog.Printf("Order %s not registered", job.orderNumber)
+	// 	return
+	// }
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
 		response, statusCode = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 		if statusCode == 429 {
