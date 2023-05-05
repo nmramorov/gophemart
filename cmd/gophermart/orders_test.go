@@ -60,7 +60,7 @@ func TestPostOrders(t *testing.T) {
 			},
 			args: arguments{
 				url:         "http://localhost:8080/api/user/orders",
-				number:      "",
+				number:      "714683",
 				contentType: "text/plain",
 			},
 		},
