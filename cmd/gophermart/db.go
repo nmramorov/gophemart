@@ -165,7 +165,7 @@ func (c *DBCursor) GetOrders(username string) ([]*Order, error) {
 	foundOrders := []*Order{}
 	for rows.Next() {
 		var o Order
-		if err = rows.Scan(&o.Username, o.Number, o.Status, o.Accrual, o.UploadedAt); err != nil {
+		if err = rows.Scan(&o.Username, &o.Number, &o.Status, &o.Accrual, &o.UploadedAt); err != nil {
 			ErrorLog.Fatalf("error scanning order for %s from db: %e", username, err)
 			return foundOrders, err
 		}
@@ -288,7 +288,7 @@ func (c *DBCursor) GetAllOrders() []*Order {
 	foundOrders := []*Order{}
 	for rows.Next() {
 		var o Order
-		if err = rows.Scan(&o.Username, o.Number, o.Status, o.Accrual, o.UploadedAt); err != nil {
+		if err = rows.Scan(&o.Username, &o.Number, &o.Status, &o.Accrual, &o.UploadedAt); err != nil {
 			ErrorLog.Fatalf("error scanning order from db: %e", err)
 			return foundOrders
 		}
