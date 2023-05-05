@@ -96,7 +96,7 @@ func (c *DBCursor) Connect() {}
 func (c *DBCursor) Update() {}
 
 func (c *DBCursor) SaveSession(id string, session *Session) {
-	_, err := c.DB.ExecContext(c.Context, SaveSession, id, session.Username, session.Token, session.ExpiresAt)
+	_, err := c.DB.ExecContext(c.Context, SaveSession, session.Username, session.Token, session.ExpiresAt)
 	if err != nil {
 		ErrorLog.Fatalf("error inserting row %s to db: %e", id, err)
 	}
