@@ -90,11 +90,12 @@ func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNoContent)
 		rw.Write([]byte(`no orders found`))
 	} else {
-		InfoLog.Println("Writing orders to JSON")
+		// InfoLog.Println("Writing orders to JSON")
 		body := bytes.NewBuffer([]byte{})
 		encoder := json.NewEncoder(body)
 		encoder.Encode(&orders)
 		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusOK)
 		rw.Write(body.Bytes())
 	}
 }
