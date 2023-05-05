@@ -50,7 +50,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if order == nil {
-		InfoLog.Printf("Adding new order %s", requestNumber)
+		InfoLog.Printf("Adding new order %s for user %s", requestNumber, username)
 		newOrder := &Order{
 			Number:     requestNumber,
 			Username:   username,
