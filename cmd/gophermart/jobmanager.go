@@ -55,13 +55,13 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 func (jm *Jobmanager) RunJob(job *Job) {
 	response, statusCode := jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 	if statusCode == 429 {
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Second)
 	}
 
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
 		response, statusCode = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 		if statusCode == 429 {
-			time.Sleep(2 * time.Second)
+			time.Sleep(time.Second)
 			continue
 		}
 		// jm.mu.Lock()
