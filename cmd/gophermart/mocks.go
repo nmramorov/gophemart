@@ -137,3 +137,11 @@ func (mock *MockDB) GetSession(token string) (*Session, bool) {
 	}
 	return &session, true
 }
+
+func (mock *MockDB) GetAllOrders() []*Order {
+	result := make([]*Order, 0)
+	for _, orders := range mock.orders {
+		result = append(result, orders...)
+	}
+	return result
+}

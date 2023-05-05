@@ -51,12 +51,18 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	if order == nil {
-		h.Cursor.SaveOrder(&Order{
+		newOrder := &Order{
 			Number:     requestNumber,
 			Username:   username,
 			UploadedAt: time.Now(),
 			Status:     "NEW",
-		})
+		}
+		err := ValidateOrder(h.Cursor, newOrder)
+		if err != nil {
+			http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
+			return
+		}
+		h.Cursor.SaveOrder(newOrder)
 		h.Manager.AddJob(requestNumber, username)
 		rw.WriteHeader(http.StatusAccepted)
 		rw.Write([]byte(`new order created`))

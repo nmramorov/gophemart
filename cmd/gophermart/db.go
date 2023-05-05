@@ -16,6 +16,7 @@ type DBInterface interface {
 	GetWithdrawals(string) ([]*Withdrawal, error)
 	SaveWithdrawal(*Withdrawal)
 	UpdateOrder(string, *AccrualResponse)
+	GetAllOrders() []*Order
 }
 
 type Cursor struct {
