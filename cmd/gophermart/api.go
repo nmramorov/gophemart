@@ -16,6 +16,9 @@ func NewHandler(accrualUrl string, cursor *Cursor) *Handler {
 		Cursor:  cursor,
 		Manager: NewJobmanager(cursor, accrualUrl),
 	}
+	handler.Use(GzipHandle)
+	handler.Use(handler.CookieHandle)
+
 	handler.Post("/api/user/register", handler.RegisterUser)
 	handler.Post("/api/user/login", handler.Login)
 	handler.Post("/api/user/orders", handler.UploadOrder)

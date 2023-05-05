@@ -119,3 +119,11 @@ func (mock *MockDb) UpdateOrder(from *AccrualResponse) {
 		}
 	}
 }
+
+func (mock *MockDb) GetSession(token string) (*Session, bool) {
+	session, ok := mock.sessions[token]
+	if !ok {
+		return nil, false
+	}
+	return &session, true
+}

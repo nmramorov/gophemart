@@ -6,6 +6,7 @@ type DbInterface interface {
 	GetUserInfo(*UserInfo) (*UserInfo, error)
 	Update()
 	SaveSession(string, *Session)
+	GetSession(string) (*Session, bool)
 	GetOrder(string) (*Order, error)
 	SaveOrder(*Order)
 	GetOrders() ([]*Order, error)
