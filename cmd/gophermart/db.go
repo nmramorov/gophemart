@@ -195,14 +195,11 @@ func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 		ErrorLog.Fatalf("error during getting user balance from db: %e", row.Err())
 		return nil, row.Err()
 	}
+	InfoLog.Printf("Getting balance for user %s", username)
 	foundBalance := &Balance{}
 	err := row.Scan(&foundBalance.User, &foundBalance.Current, &foundBalance.Withdrawn)
 	if err == sql.ErrNoRows {
-		return &Balance{
-			User:      username,
-			Withdrawn: 0.0,
-			Current:   0.0,
-		}, nil
+		return foundBalance, nil
 	}
 	if err != nil {
 		ErrorLog.Fatalf("error scanning balance from db: %e", err)
@@ -216,6 +213,7 @@ func (c *DBCursor) SaveUserBalance(username string, newBalance *Balance) *Balanc
 	if err != nil {
 		ErrorLog.Fatalf("error during saving balance for user %s: %e", username, err)
 	}
+	InfoLog.Printf("Saved balance for %s, accrual is %f", username, newBalance.Current)
 	newBalance.User = username
 	return newBalance
 }
@@ -289,7 +287,7 @@ func (c *DBCursor) GetSession(token string) (*Session, bool) {
 		return nil, false
 	}
 	foundSession := &Session{}
-	InfoLog.Println(row)
+
 	err := row.Scan(&foundSession.Username, &foundSession.Token, &foundSession.ExpiresAt)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning session from db: %e", err)
