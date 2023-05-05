@@ -222,12 +222,12 @@ func (c *DBCursor) GetWithdrawals(username string) ([]*Withdrawal, error) {
 	}
 	foundWithdrawals := []*Withdrawal{}
 	for rows.Next() {
-		var w *Withdrawal
+		var w Withdrawal
 		if err := rows.Scan(&w.User, &w.Order, &w.Sum, &w.ProcessedAt); err != nil {
 			ErrorLog.Fatalf("error scanning withdrawal from db: %e", err)
 			return foundWithdrawals, err
 		}
-		foundWithdrawals = append(foundWithdrawals, w)
+		foundWithdrawals = append(foundWithdrawals, &w)
 	}
 	if err = rows.Err(); err != nil {
 		return foundWithdrawals, err
