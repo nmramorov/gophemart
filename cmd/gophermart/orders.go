@@ -70,6 +70,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	InfoLog.Println(order.Username, username)
 	if order.Username != username {
 		ErrorLog.Printf("Validation error for order %s, token %s", order.Number, sessionToken)
 		http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
