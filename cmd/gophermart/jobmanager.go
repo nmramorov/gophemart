@@ -36,13 +36,14 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 	if err != nil {
 		ErrorLog.Fatalf("Error getting order from accrual: %e", err)
 	}
+	InfoLog.Printf("Accrual GET status code: %d", resp.StatusCode)
 	if resp.StatusCode == 429 {
 		return nil, resp.StatusCode
 	}
 	if resp.StatusCode == 204 {
 		return &AccrualResponse{Status: "NEW"}, 204
 	}
-	// InfoLog.Println(resp)
+
 	defer resp.Body.Close()
 	result := &AccrualResponse{}
 	// InfoLog.Println(resp.Body)
