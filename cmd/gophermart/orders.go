@@ -49,8 +49,8 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	if order == nil {
+		InfoLog.Printf("Adding new order %s", order.Number)
 		newOrder := &Order{
 			Number:     requestNumber,
 			Username:   username,

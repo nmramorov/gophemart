@@ -135,7 +135,7 @@ func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 	foundOrder := &Order{}
 	err := row.Scan(&foundOrder.Number, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt, &foundOrder.Username)
 	if err == sql.ErrNoRows {
-		InfoLog.Println("No rows found for this order")
+		ErrorLog.Printf("No rows found for order %s", number)
 		return nil, nil
 	}
 	if err != nil {
@@ -221,10 +221,16 @@ func (c *DBCursor) GetWithdrawals(username string) ([]*Withdrawal, error) {
 		return nil, rows.Err()
 	}
 	foundWithdrawals := []*Withdrawal{}
-	err = rows.Scan(&foundWithdrawals)
-	if err != nil {
-		ErrorLog.Fatalf("error scanning withdrawals from db: %e", err)
-		return nil, err
+	for rows.Next() {
+		var w *Withdrawal
+		if err := rows.Scan(&w.User, &w.Order, &w.Sum, &w.ProcessedAt); err != nil {
+			ErrorLog.Fatalf("error scanning withdrawal from db: %e", err)
+			return foundWithdrawals, err
+		}
+		foundWithdrawals = append(foundWithdrawals, w)
+	}
+	if err = rows.Err(); err != nil {
+		return foundWithdrawals, err
 	}
 	return foundWithdrawals, nil
 }
