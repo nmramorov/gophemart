@@ -1,5 +1,11 @@
 package main
 
+import (
+	"strconv"
+
+	"github.com/theplant/luhn"
+)
+
 func ValidateUserInfo(input *UserInfo) error {
 	if input.Password == "" || input.Username == "" {
 		return ErrValidation
@@ -16,11 +22,20 @@ func ValidateLogin(input *UserInfo, existingInfo *UserInfo) error {
 	return ErrValidation
 }
 
-func ValidateOrder(cursor *Cursor, username string, orderToValidate string)  error {
+func ValidateOrder(cursor *Cursor, username string, orderToValidate string) error {
 	userOrders, _ := cursor.GetOrders()
 	for _, order := range userOrders {
 		if orderToValidate == order.Number {
-			return nil
+			orderInt, err := strconv.Atoi(orderToValidate)
+			if err != nil {
+				return err
+			}
+			if luhn.Valid(orderInt) {
+				return nil
+			} else {
+				return ErrValidation
+			}
+
 		}
 	}
 	return ErrValidation

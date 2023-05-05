@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
+	github.com/theplant/luhn v0.0.0-20170224032821-81a1a381387a // indirect
 	golang.org/x/net v0.0.0-20211029224645-99673261e6eb // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
