@@ -29,6 +29,7 @@ func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
 }
 
 func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, int) {
+	InfoLog.Printf("calling accrual to get order %s by %s", number, url)
 	getOrder, _ := http.NewRequest(http.MethodGet, url+"/api/orders/"+number, nil)
 	resp, err := jm.client.Do(getOrder)
 	if err != nil {

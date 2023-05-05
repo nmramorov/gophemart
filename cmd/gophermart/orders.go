@@ -59,7 +59,7 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, "order was uploaded already by another user", http.StatusConflict)
 		return
 	}
-
+	InfoLog.Printf("request number: %s", requestNumber)
 	//ToDo: call Accrual Worker to get updates for specific order in goroutine
 	h.Manager.AddJob(requestNumber)
 
