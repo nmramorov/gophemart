@@ -22,11 +22,11 @@ func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	InfoLog.Println(withrawal)
-	err = ValidateOrder(h.Cursor, username, withrawal.Order)
-	if err != nil {
-		http.Error(rw, "invalid order number", http.StatusUnprocessableEntity)
-		return
-	}
+	// err = ValidateOrder(h.Cursor, username, withrawal.Order)
+	// if err != nil {
+	// 	http.Error(rw, "invalid order number", http.StatusUnprocessableEntity)
+	// 	return
+	// }
 
 	userBalance, err := h.Cursor.GetUserBalance(username)
 	if err != nil {
