@@ -8,10 +8,10 @@ const (
 	GetOrders             = `SELECT * FROM orders WHERE username=$1;`
 	GetSessionUser        = `SELECT username FROM _sessions WHERE token=$1;`
 	GetBalance            = `SELECT * FROM balances WHERE username=$1;`
-	UpdateBalance  string = `UPDATE balances SET (_current=$1, withdrawn=$2) WHERE username=$3;`
+	UpdateBalance  string = `UPDATE balances SET _current=$1, withdrawn=$2 WHERE username=$3;`
 	GetWithdrawals        = `SELECT * FROM withdrawal WHERE username=$1;`
 	SaveWithdrawal        = `INSERT INTO withdrawal VALUES ($1, $2, $3, $4);`
-	UpdateOrder           = `UPDATE orders SET (_number=$1, status=$2, accrual=$3) WHERE username=$4;`
+	UpdateOrder           = `UPDATE orders SET _number=$1, status=$2, accrual=$3 WHERE username=$4;`
 	GetSession            = `SELECT * FROM _sessions WHERE token=$1;`
 	GetAllOrders          = `SELECT * FROM orders;`
 	SaveUserInfo          = `INSERT INTO userinfo VALUES ($1, $2);`
