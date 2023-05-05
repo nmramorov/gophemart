@@ -103,7 +103,12 @@ func (c *DBCursor) SaveSession(id string, session *Session) {
 }
 
 func (c *DBCursor) SaveUserInfo(info *UserInfo) bool {
-	return false
+	_, err := c.DB.ExecContext(c.Context, SaveUserInfo, info.Username, info.Password)
+	if err != nil {
+		ErrorLog.Fatalf("error inserting row into Userinfo: %e", err)
+		return false
+	}
+	return true
 }
 
 func (c *DBCursor) GetUserInfo(info *UserInfo) (*UserInfo, error) {

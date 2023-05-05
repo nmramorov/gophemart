@@ -14,4 +14,5 @@ const (
 	UpdateOrder           = `UPDATE orders SET (_number=$1, status=$2, accrual=$3) WHERE username=$4;`
 	GetSession            = `SELECT * FROM _session WHERE token=$1;`
 	GetAllOrders          = `SELECT * FROM orders;`
+	SaveUserInfo          = `INSERT INTO userinfo VALUES ($1, $2);`
 )
