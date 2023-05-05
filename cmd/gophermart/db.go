@@ -253,7 +253,7 @@ func (c *DBCursor) GetSession(token string) (*Session, bool) {
 	}
 	foundSession := &Session{}
 	InfoLog.Println(row)
-	err := row.Scan(foundSession.Username, foundSession.Token, foundSession.ExpiresAt)
+	err := row.Scan(&foundSession.Username, &foundSession.Token, &foundSession.ExpiresAt)
 	if err != nil {
 		ErrorLog.Fatalf("error scanning session from db: %e", err)
 		return nil, false
