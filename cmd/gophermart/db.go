@@ -35,7 +35,8 @@ type Cursor struct {
 }
 
 func GetCursor(url string) *Cursor {
-	return &Cursor{NewCursor(url)}
+	// return &Cursor{NewCursor(url)}
+	return &Cursor{NewMock()}
 }
 
 type DBCursor struct {
