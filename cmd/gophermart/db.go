@@ -40,7 +40,7 @@ func GetCursor(url string) *Cursor {
 
 type DBCursor struct {
 	DBInterface
-	Db      *sql.DB
+	DB      *sql.DB
 	Context context.Context
 	IsValid bool
 }
@@ -65,7 +65,7 @@ func NewCursor(DBURL string) *DBCursor {
 		return nil
 	}
 	new := &DBCursor{
-		Db:      db,
+		DB:      db,
 		Context: context.Background(),
 		IsValid: true,
 	}
@@ -78,13 +78,13 @@ func NewCursor(DBURL string) *DBCursor {
 }
 
 func (c *DBCursor) Close() {
-	c.Db.Close()
+	c.DB.Close()
 }
 
 func (c *DBCursor) Ping() bool {
 	ctx, cancel := context.WithTimeout(c.Context, 1*time.Second)
 	defer cancel()
-	if err := c.Db.PingContext(ctx); err != nil {
+	if err := c.DB.PingContext(ctx); err != nil {
 		ErrorLog.Printf("ping error, database unreachable?: %e", err)
 		return false
 	}
@@ -96,7 +96,7 @@ func (c *DBCursor) Connect() {}
 func (c *DBCursor) Update() {}
 
 func (c *DBCursor) SaveSession(id string, session *Session) {
-	_, err := c.Db.ExecContext(c.Context, SaveSession, id, session.Username, session.Token, session.ExpiresAt)
+	_, err := c.DB.ExecContext(c.Context, SaveSession, id, session.Username, session.Token, session.ExpiresAt)
 	if err != nil {
 		ErrorLog.Fatalf("error inserting row %s to db: %e", id, err)
 	}
@@ -108,7 +108,7 @@ func (c *DBCursor) SaveUserInfo(info *UserInfo) bool {
 
 func (c *DBCursor) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 	var row *sql.Row
-	if row = c.Db.QueryRowContext(c.Context, GetUserInfo, info.Username); row.Err() != nil {
+	if row = c.DB.QueryRowContext(c.Context, GetUserInfo, info.Username); row.Err() != nil {
 		ErrorLog.Fatalf("error during getting user info from db: %e", row.Err())
 		return nil, row.Err()
 	}
@@ -123,7 +123,7 @@ func (c *DBCursor) GetUserInfo(info *UserInfo) (*UserInfo, error) {
 
 func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 	var row *sql.Row
-	if row = c.Db.QueryRowContext(c.Context, GetOrder, username, number); row.Err() != nil {
+	if row = c.DB.QueryRowContext(c.Context, GetOrder, username, number); row.Err() != nil {
 		ErrorLog.Fatalf("error during getting order %s from db: %e", number, row.Err())
 		return nil, row.Err()
 	}
@@ -137,18 +137,21 @@ func (c *DBCursor) GetOrder(username string, number string) (*Order, error) {
 }
 
 func (c *DBCursor) SaveOrder(order *Order) {
-	_, err := c.Db.ExecContext(c.Context, SaveOrder, order.Username, order.Number, order.Status, order.Accrual, order.UploadedAt)
+	_, err := c.DB.ExecContext(c.Context, SaveOrder, order.Username, order.Number, order.Status, order.Accrual, order.UploadedAt)
 	if err != nil {
 		ErrorLog.Fatalf("error during saving order %s to db: %e", order.Number, err)
 	}
 }
 
 func (c *DBCursor) GetOrders(username string) ([]*Order, error) {
-	rows, err := c.Db.QueryContext(c.Context, GetOrders, username)
-
+	rows, err := c.DB.QueryContext(c.Context, GetOrders, username)
 	if err != nil {
 		ErrorLog.Fatalf("error during getting orders from db: %e", err)
 		return nil, err
+	}
+	if rows.Err() != nil {
+		ErrorLog.Fatalf("error during getting orders from db: %e", rows.Err())
+		return nil, rows.Err()
 	}
 	foundOrders := []*Order{}
 	err = rows.Scan(foundOrders)
@@ -161,7 +164,7 @@ func (c *DBCursor) GetOrders(username string) ([]*Order, error) {
 
 func (c *DBCursor) GetUsernameByToken(token string) (string, error) {
 	var row *sql.Row
-	if row = c.Db.QueryRowContext(c.Context, GetSessionUser, token); row.Err() != nil {
+	if row = c.DB.QueryRowContext(c.Context, GetSessionUser, token); row.Err() != nil {
 		ErrorLog.Fatalf("error during getting current session user from db: %e", row.Err())
 		return "", row.Err()
 	}
@@ -176,7 +179,7 @@ func (c *DBCursor) GetUsernameByToken(token string) (string, error) {
 
 func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 	var row *sql.Row
-	if row = c.Db.QueryRowContext(c.Context, GetBalance, username); row.Err() != nil {
+	if row = c.DB.QueryRowContext(c.Context, GetBalance, username); row.Err() != nil {
 		ErrorLog.Fatalf("error during getting user balance from db: %e", row.Err())
 		return nil, row.Err()
 	}
@@ -190,7 +193,7 @@ func (c *DBCursor) GetUserBalance(username string) (*Balance, error) {
 }
 
 func (c *DBCursor) UpdateUserBalance(username string, newBalance *Balance) *Balance {
-	_, err := c.Db.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
+	_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
 	if err != nil {
 		ErrorLog.Fatalf("error during updating balance: %e", err)
 	}
@@ -198,11 +201,15 @@ func (c *DBCursor) UpdateUserBalance(username string, newBalance *Balance) *Bala
 }
 
 func (c *DBCursor) GetWithdrawals(username string) ([]*Withdrawal, error) {
-	rows, err := c.Db.QueryContext(c.Context, GetWithdrawals, username)
+	rows, err := c.DB.QueryContext(c.Context, GetWithdrawals, username)
 
 	if err != nil {
 		ErrorLog.Fatalf("error during getting withdrawals from db: %e", err)
 		return nil, err
+	}
+	if rows.Err() != nil {
+		ErrorLog.Fatalf("error during getting withdrawals from db: %e", rows.Err())
+		return nil, rows.Err()
 	}
 	foundWithdrawals := []*Withdrawal{}
 	err = rows.Scan(foundWithdrawals)
@@ -214,7 +221,7 @@ func (c *DBCursor) GetWithdrawals(username string) ([]*Withdrawal, error) {
 }
 
 func (c *DBCursor) SaveWithdrawal(withdrawal *Withdrawal) {
-	_, err := c.Db.ExecContext(c.Context, SaveWithdrawal, withdrawal.User, withdrawal.Order, withdrawal.Sum, withdrawal.ProcessedAt)
+	_, err := c.DB.ExecContext(c.Context, SaveWithdrawal, withdrawal.User, withdrawal.Order, withdrawal.Sum, withdrawal.ProcessedAt)
 	if err != nil {
 		ErrorLog.Fatalf("error during saving withdrawal to db: %e", err)
 	}
@@ -227,7 +234,7 @@ func (c *DBCursor) UpdateOrder(username string, from *AccrualResponse) {
 	} else {
 		status = from.Status
 	}
-	_, err := c.Db.ExecContext(c.Context, UpdateOrder, from.Order, status, from.Accrual, username)
+	_, err := c.DB.ExecContext(c.Context, UpdateOrder, from.Order, status, from.Accrual, username)
 	if err != nil {
 		ErrorLog.Fatalf("error during updating order: %e", err)
 	}
@@ -235,7 +242,7 @@ func (c *DBCursor) UpdateOrder(username string, from *AccrualResponse) {
 
 func (c *DBCursor) GetSession(token string) (*Session, bool) {
 	var row *sql.Row
-	if row = c.Db.QueryRowContext(c.Context, GetSession, token); row.Err() != nil {
+	if row = c.DB.QueryRowContext(c.Context, GetSession, token); row.Err() != nil {
 		ErrorLog.Fatalf("error during getting user session from db: %e", row.Err())
 		return nil, false
 	}
@@ -249,10 +256,14 @@ func (c *DBCursor) GetSession(token string) (*Session, bool) {
 }
 
 func (c *DBCursor) GetAllOrders() []*Order {
-	rows, err := c.Db.QueryContext(c.Context, GetAllOrders)
+	rows, err := c.DB.QueryContext(c.Context, GetAllOrders)
 
 	if err != nil {
 		ErrorLog.Fatalf("error during getting all orders from db: %e", err)
+		return nil
+	}
+	if rows.Err() != nil {
+		ErrorLog.Fatalf("error during getting all orders from db: %e", rows.Err())
 		return nil
 	}
 	foundOrders := []*Order{}
