@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"sync"
+	// "sync"
 	"time"
 )
 
@@ -15,7 +15,7 @@ type Jobmanager struct {
 	AccrualURL string
 	Jobs       chan *Job
 	Cursor     *Cursor
-	mu         sync.Mutex
+	// mu         sync.Mutex
 	client     *http.Client
 }
 
@@ -29,7 +29,7 @@ func NewJobmanager(cursor *Cursor, accrualURL string) *Jobmanager {
 }
 
 func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, int) {
-	InfoLog.Printf("calling accrual to get order %s by %s", number, url)
+	// InfoLog.Printf("calling accrual to get order %s by %s", number, url)
 	getOrder, _ := http.NewRequest(http.MethodGet, url+"/api/orders/"+number, nil)
 	resp, err := jm.client.Do(getOrder)
 	if err != nil {
@@ -38,10 +38,10 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*AccrualResponse, i
 	if resp.StatusCode == 429 {
 		return nil, resp.StatusCode
 	}
-	InfoLog.Println(resp)
+	// InfoLog.Println(resp)
 	defer resp.Body.Close()
 	result := &AccrualResponse{}
-	InfoLog.Println(resp.Body)
+	// InfoLog.Println(resp.Body)
 	if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
 		ErrorLog.Printf("Error decoding accrual response: %e", err)
 		return &AccrualResponse{Status: "NEW"}, 500
@@ -61,13 +61,13 @@ func (jm *Jobmanager) RunJob(job *Job) {
 			time.Sleep(2 * time.Second)
 			continue
 		}
-		jm.mu.Lock()
+		// jm.mu.Lock()
 		jm.Cursor.UpdateOrder(response)
-		jm.mu.Unlock()
+		// jm.mu.Unlock()
 	}
-	jm.mu.Lock()
+	// jm.mu.Lock()
 	jm.Cursor.UpdateOrder(response)
-	jm.mu.Unlock()
+	// jm.mu.Unlock()
 	InfoLog.Println("Job finished")
 }
 
