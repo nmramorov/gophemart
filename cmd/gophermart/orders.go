@@ -74,10 +74,8 @@ func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 	InfoLog.Printf("request number: %s", requestNumber)
-	//ToDo: call Accrual Worker to get updates for specific order in goroutine
 
 	if order.Number == requestNumber {
-		// h.Manager.AddJob(requestNumber)
 		rw.WriteHeader(http.StatusOK)
 		rw.Write([]byte(`order created already`))
 	}
@@ -92,8 +90,6 @@ func GetOrderFromDB(cursor *Cursor, username string, requestOrder string) (*Orde
 }
 
 func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
-	// h.Manager.mu.Lock()
-	// defer h.Manager.mu.Unlock()
 	cookie, _ := r.Cookie("session_token")
 	sessionToken := cookie.Value
 	username, err := h.Cursor.GetUsernameByToken(sessionToken)
@@ -102,8 +98,6 @@ func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	orders, err := h.Cursor.GetOrders(username)
-	// InfoLog.Println(&orders)
-	// defer h.Manager.mu.Unlock()
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	}
@@ -111,7 +105,6 @@ func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusNoContent)
 		rw.Write([]byte(`no orders found`))
 	} else {
-		// InfoLog.Println("Writing orders to JSON")
 		body := bytes.NewBuffer([]byte{})
 		encoder := json.NewEncoder(body)
 		encoder.Encode(&orders)
