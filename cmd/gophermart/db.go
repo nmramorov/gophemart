@@ -223,7 +223,11 @@ func (c *DBCursor) SaveUserBalance(username string, newBalance *Balance) *Balanc
 func (c *DBCursor) UpdateUserBalance(username string, newBalance *Balance) *Balance {
 	_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
 	if err == sql.ErrNoRows {
-		return c.SaveUserBalance(username, newBalance)
+		c.SaveUserBalance(username, newBalance)
+		_, err := c.DB.ExecContext(c.Context, UpdateBalance, newBalance.Current, newBalance.Withdrawn, username)
+		if err != nil {
+			ErrorLog.Fatalf("error during updating balance after saving: %e", err)
+		}
 	}
 	if err != nil {
 		ErrorLog.Fatalf("error during updating balance: %e", err)
