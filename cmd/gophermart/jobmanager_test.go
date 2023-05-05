@@ -12,7 +12,7 @@ import (
 )
 
 func TestJobmanager(t *testing.T) {
-	handler := NewHandler("http://localhost:8081", &Cursor{NewMock()}, &Cursor{NewMock()})
+	handler := NewHandler("http://localhost:8081", &Cursor{NewMock()})
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&UserInfo{
 		Username: "test",
