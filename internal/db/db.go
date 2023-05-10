@@ -132,9 +132,9 @@ func (c *DBCursor) GetOrder(username string, number string) (*models.Order, erro
 		return nil, row.Err()
 	}
 	foundOrder := &models.Order{}
-	err := row.Scan(&foundOrder.Number, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt, &foundOrder.Username)
+	err := row.Scan(&foundOrder.Username, &foundOrder.Number, &foundOrder.Status, &foundOrder.Accrual, &foundOrder.UploadedAt)
 	if err == sql.ErrNoRows {
-		logger.ErrorLog.Printf("No rows found for order %s", number)
+		logger.ErrorLog.Printf("No rows found for order %s and user %s", number, username)
 		return nil, nil
 	}
 	if err != nil {
@@ -266,7 +266,7 @@ func (c *DBCursor) UpdateOrder(username string, from *models.AccrualResponse) {
 	} else {
 		status = from.Status
 	}
-	_, err := c.DB.ExecContext(c.Context, UpdateOrder, from.Order, status, from.Accrual, username)
+	_, err := c.DB.ExecContext(c.Context, UpdateOrder, status, from.Accrual, username, from.Order)
 	if err != nil {
 		logger.ErrorLog.Fatalf("error during updating order: %e", err)
 	}
