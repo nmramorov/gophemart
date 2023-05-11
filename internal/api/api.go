@@ -30,14 +30,14 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 	handler.Use(middleware.Timeout(REQUEST_TIMEOUT * time.Second))
 
 	handler.Route("/api/user", func(r chi.Router) {
-		userRouter := NewUserRouter(handler)
-		r.Mount("/", userRouter)
+		UserRouter := NewUserRouter(handler)
+		r.Mount("/", UserRouter)
 
-		ordersRouter := NewOrdersRouter(handler)
-		r.Mount("/orders", ordersRouter)
+		OrdersRouter := NewOrdersRouter(handler)
+		r.Mount("/orders", OrdersRouter)
 
-		balanceWithdrawalRouter := NewBalanceWithdrawalsRouter(handler)
-		r.Mount("/", balanceWithdrawalRouter)
+		BalanceWithdrawalRouter := NewBalanceWithdrawalsRouter(handler)
+		r.Mount("/", BalanceWithdrawalRouter)
 	})
 
 	return handler
