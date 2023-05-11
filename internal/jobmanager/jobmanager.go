@@ -1,12 +1,14 @@
 package jobmanager
 
 import (
+	"context"
 	"sync"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 
 	"github.com/nmramorov/gophemart/internal/db"
+	"github.com/nmramorov/gophemart/internal/errors"
 	"github.com/nmramorov/gophemart/internal/logger"
 	"github.com/nmramorov/gophemart/internal/models"
 )
@@ -14,6 +16,7 @@ import (
 type Job struct {
 	orderNumber string
 	username    string
+	cancel      context.CancelFunc
 }
 
 type Jobmanager struct {
@@ -22,14 +25,21 @@ type Jobmanager struct {
 	Cursor     *db.Cursor
 	mu         sync.Mutex
 	client     *resty.Client
+	context    context.Context
+	cancel     context.CancelFunc
 }
 
-func NewJobmanager(cursor *db.Cursor, accrualURL string) *Jobmanager {
+const JOBTIMEOUT = 10
+
+func NewJobmanager(cursor *db.Cursor, accrualURL string, parent *context.Context) *Jobmanager {
+	ctx, cancel := context.WithCancel(*parent)
 	return &Jobmanager{
 		AccrualURL: accrualURL,
 		Jobs:       make(chan *Job),
 		Cursor:     cursor,
 		client:     resty.New().SetBaseURL(accrualURL),
+		context:    ctx,
+		cancel:     cancel,
 	}
 }
 
@@ -54,10 +64,10 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*models.AccrualResp
 	return &acc, resp.StatusCode(), nil
 }
 
-func (jm *Jobmanager) RunJob(job *Job) error {
+func (jm *Jobmanager) RunJob(job *Job) {
 	response, statusCode, err := jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 	if err != nil {
-		return err
+		job.cancel()
 	}
 	if statusCode == 429 {
 		time.Sleep(time.Second)
@@ -65,7 +75,7 @@ func (jm *Jobmanager) RunJob(job *Job) error {
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
 		response, statusCode, err = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
 		if err != nil {
-			return err
+			job.cancel()
 		}
 		if statusCode == 429 {
 			time.Sleep(time.Second)
@@ -83,17 +93,33 @@ func (jm *Jobmanager) RunJob(job *Job) error {
 	})
 	jm.mu.Unlock()
 	logger.InfoLog.Println("Job finished")
+}
+
+func (jm *Jobmanager) AddJob(orderNumber string, username string) error {
+	_, cancel := context.WithTimeout(jm.context, JOBTIMEOUT*time.Second)
+	jm.Jobs <- &Job{orderNumber: orderNumber, username: username, cancel: cancel}
+	if jm.Jobs == nil {
+		cancel()
+		return errors.ErrJobChannelClosed
+	}
 	return nil
 }
 
-func (jm *Jobmanager) AddJob(orderNumber string, username string) {
-	jm.Jobs <- &Job{orderNumber: orderNumber, username: username}
-}
-
 func (jm *Jobmanager) ManageJobs(accrualURL string) {
-	for job := range jm.Jobs {
-		logger.InfoLog.Printf("Running job for order %s", job.orderNumber)
-		go jm.RunJob(job)
+	select {
+	case <-jm.context.Done():
+		close(jm.Jobs)
+		jm.cancel()
+	default:
+		var wg sync.WaitGroup
+		for job := range jm.Jobs {
+			wg.Add(1)
+			logger.InfoLog.Printf("Running job for order %s", job.orderNumber)
+			go jm.RunJob(job)
+			wg.Done()
+		}
 	}
-	close(jm.Jobs)
+
+	// close(jm.Jobs)
+	// jm.cancel()
 }

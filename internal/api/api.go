@@ -1,10 +1,7 @@
 package api
 
 import (
-	"time"
-
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/nmramorov/gophemart/internal/db"
 	"github.com/nmramorov/gophemart/internal/jobmanager"
@@ -40,7 +37,6 @@ func NewHandler(cursor *db.Cursor, manager *jobmanager.Jobmanager) *Handler {
 	}
 	handler.Use(GzipHandle)
 	handler.Use(handler.CookieHandle)
-	handler.Use(middleware.Timeout(REQUESTTIMEOUT * time.Second))
 
 	userRouter := &UserRouter{
 		Mux:    chi.NewMux(),

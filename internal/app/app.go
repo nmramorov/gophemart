@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/nmramorov/gophemart/internal/api"
@@ -28,11 +29,12 @@ func NewApp(config *config.Config) (*App, error) {
 	logger.InfoLog.Printf("Application is running on addr %s", config.Address)
 	logger.InfoLog.Printf("Accrual addr is %s", config.Accrual)
 	logger.InfoLog.Printf("DB addr is %s", config.DatabaseURI)
+	ctx := context.Background()
 	cursor, err := db.GetCursor(config.DatabaseURI)
 	if err != nil {
 		return nil, err
 	}
-	manager := jobmanager.NewJobmanager(cursor, config.Accrual)
+	manager := jobmanager.NewJobmanager(cursor, config.Accrual, &ctx)
 	handler := api.NewHandler(cursor, manager)
 	server := &http.Server{
 		Addr:    config.Address,

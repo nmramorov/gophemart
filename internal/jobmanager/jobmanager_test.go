@@ -2,6 +2,7 @@ package jobmanager
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -20,17 +21,17 @@ import (
 
 type TestHandler struct {
 	*chi.Mux
-	Cursor *db.Cursor
+	Cursor  *db.Cursor
 	Manager *Jobmanager
 }
 
-
 func TestJobmanager(t *testing.T) {
 	cursor := &db.Cursor{DBInterface: mocks.NewMock()}
+	ctx := context.Background()
 	handler := &TestHandler{
 		chi.NewMux(),
 		cursor,
-		NewJobmanager(cursor, "localhost:8081"),
+		NewJobmanager(cursor, "localhost:8081", &ctx),
 	}
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{
