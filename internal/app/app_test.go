@@ -19,7 +19,7 @@ func TestApp(t *testing.T) {
 	if err != nil {
 		logger.ErrorLog.Fatal(err)
 	}
-	app := NewApp(config.NewConfig(flags, envs))
+	app, _ := NewApp(config.NewConfig(flags, envs))
 	go app.Run()
 
 	client := &http.Client{}

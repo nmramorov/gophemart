@@ -12,6 +12,9 @@ func main() {
 	if err != nil {
 		logger.ErrorLog.Fatal(err)
 	}
-	app := app.NewApp(config.NewConfig(flags, envs))
+	app, _err := app.NewApp(config.NewConfig(flags, envs))
+	if _err != nil {
+		logger.ErrorLog.Fatal(_err)
+	}
 	app.Run()
 }

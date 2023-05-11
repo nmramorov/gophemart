@@ -24,11 +24,14 @@ func (a *App) Run() {
 	}
 }
 
-func NewApp(config *config.Config) *App {
+func NewApp(config *config.Config) (*App, error) {
 	logger.InfoLog.Printf("Application is running on addr %s", config.Address)
 	logger.InfoLog.Printf("Accrual addr is %s", config.Accrual)
 	logger.InfoLog.Printf("DB addr is %s", config.DatabaseURI)
-	cursor := db.GetCursor(config.DatabaseURI)
+	cursor, err := db.GetCursor(config.DatabaseURI)
+	if err != nil {
+		return nil, err
+	}
 	manager := jobmanager.NewJobmanager(cursor, config.Accrual)
 	handler := api.NewHandler(cursor, manager)
 	server := &http.Server{
@@ -39,5 +42,5 @@ func NewApp(config *config.Config) *App {
 		config:  config,
 		manager: manager,
 		Server:  server,
-	}
+	}, nil
 }

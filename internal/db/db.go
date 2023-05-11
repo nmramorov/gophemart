@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/nmramorov/gophemart/internal/errors"
 	"github.com/nmramorov/gophemart/internal/logger"
 	"github.com/nmramorov/gophemart/internal/models"
 
@@ -36,8 +37,12 @@ type Cursor struct {
 	DBInterface
 }
 
-func GetCursor(url string) *Cursor {
-	return &Cursor{NewCursor(url)}
+func GetCursor(url string) (*Cursor, error) {
+	cursor, err := NewCursor(url)
+	if err != nil {
+		return nil, err
+	}
+	return &Cursor{cursor}, nil
 }
 
 type DBCursor struct {
@@ -59,38 +64,37 @@ func RunMigrations(databaseURL string) {
 	logger.InfoLog.Println("Migrations successfully executed")
 }
 
-func NewCursor(DBURL string) *DBCursor {
+func NewCursor(DBURL string) (*DBCursor, error) {
 	db, err := sql.Open("pgx", DBURL)
 	if err != nil {
 		logger.ErrorLog.Printf("Unable to connect to database: %v\n", err)
-		return nil
+		return nil, errors.ErrDatabaseUnreachable
 	}
 	new := &DBCursor{
 		DB:      db,
 		Context: context.Background(),
 	}
-	// valid := new.Ping()
+	if err := new.Ping(); err != nil {
+		logger.ErrorLog.Println(err)
+		return nil, err
+	}
 	RunMigrations(DBURL)
-	return new
+	return new, nil
 }
 
 func (c *DBCursor) Close() {
 	c.DB.Close()
 }
 
-func (c *DBCursor) Ping() bool {
+func (c *DBCursor) Ping() error {
 	ctx, cancel := context.WithTimeout(c.Context, 1*time.Second)
 	defer cancel()
 	if err := c.DB.PingContext(ctx); err != nil {
 		logger.ErrorLog.Printf("ping error, database unreachable?: %e", err)
-		return false
+		return errors.ErrDatabaseUnreachable
 	}
-	return true
+	return nil
 }
-
-func (c *DBCursor) Connect() {}
-
-func (c *DBCursor) Update() {}
 
 func (c *DBCursor) SaveSession(id string, session *models.Session) {
 	_, err := c.DB.ExecContext(c.Context, SaveSession, session.Username, session.Token, session.ExpiresAt)
