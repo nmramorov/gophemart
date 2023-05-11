@@ -15,7 +15,7 @@ import (
 	"github.com/nmramorov/gophemart/internal/models"
 )
 
-func (h *Handler) UploadOrder(rw http.ResponseWriter, r *http.Request) {
+func (h *OrderRouter) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 	val := r.Header.Get("Content-Type")
 	if val != "text/plain" {
 		http.Error(rw, "wrong content", http.StatusBadRequest)
@@ -96,7 +96,7 @@ func GetOrderFromDB(cursor *db.Cursor, username string, requestOrder string) (*m
 	return order, nil
 }
 
-func (h *Handler) GetOrders(rw http.ResponseWriter, r *http.Request) {
+func (h *OrderRouter) GetOrders(rw http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("session_token")
 	sessionToken := cookie.Value
 	username, err := h.Cursor.GetUsernameByToken(sessionToken)

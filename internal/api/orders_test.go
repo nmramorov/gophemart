@@ -99,9 +99,15 @@ func TestPostOrders(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
+	r := &OrderRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
 	handler.Post("/api/user/register", handler.RegisterUser)
 	handler.Post("/api/user/login", handler.Login)
-	handler.Post("/api/user/orders", handler.UploadOrder)
+	handler.Post("/api/user/orders", r.UploadOrder)
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{
 		Username: "test",
@@ -240,7 +246,13 @@ func TestGetOrders(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
-	handler.Get("/api/user/orders", handler.GetOrders)
+	r := &OrderRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
+	handler.Get("/api/user/orders", r.GetOrders)
 	ts := httptest.NewServer(handler)
 
 	defer ts.Close()

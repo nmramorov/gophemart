@@ -1,7 +1,6 @@
 package api
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -12,6 +11,23 @@ import (
 )
 
 const REQUESTTIMEOUT = 60
+
+type UserRouter struct {
+	*chi.Mux
+	Cursor *db.Cursor
+}
+
+type OrderRouter struct {
+	*chi.Mux
+	Cursor  *db.Cursor
+	Manager *jobmanager.Jobmanager
+}
+
+type BalanceRouter struct {
+	*chi.Mux
+	Cursor *db.Cursor
+	// Manager *jobmanager.Jobmanager
+}
 
 type Handler struct {
 	*chi.Mux
@@ -33,30 +49,22 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 		r.Post("/register", handler.RegisterUser)
 		r.Post("/login", handler.Login)
 
-		// r.Route("/orders", func(r chi.Router) {
-		// 	r.Post("/", handler.UploadOrder)
-		// 	r.Get("/", handler.GetOrders)
-		// })
-
 		r.Get("/withdrawals", handler.GetWithdrawals)
 		r.Get("/balance", handler.GetBalance)
 		r.Post("/balance/withdraw", handler.WithdrawMoney)
-		// UserRouter := NewUserRouter(handler)
-		// r.Mount("/", UserRouter)
 
-		OrdersRouter := NewOrdersRouter(handler)
+		OrdersRouter := NewOrdersRouter(cursor)
 		r.Mount("/orders", OrdersRouter)
-
-		// BalanceWithdrawalRouter := NewBalanceWithdrawalsRouter(handler)
-		// r.Mount("/", BalanceWithdrawalRouter)
 	})
 
 	return handler
 }
 
-func NewOrdersRouter(handler *Handler) http.Handler {
-	r := chi.NewRouter()
-	r.Post("/", handler.UploadOrder)
-	r.Get("/", handler.GetOrders)
+func NewOrdersRouter(cursor *db.Cursor) *OrderRouter {
+	r := &OrderRouter{
+		Cursor: cursor,
+	}
+	r.Post("/", r.UploadOrder)
+	r.Get("/", r.GetOrders)
 	return r
 }
