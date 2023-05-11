@@ -10,7 +10,7 @@ import (
 	"github.com/nmramorov/gophemart/internal/models"
 )
 
-func (h *Handler) RegisterUser(rw http.ResponseWriter, r *http.Request) {
+func (h *UserRouter) RegisterUser(rw http.ResponseWriter, r *http.Request) {
 	userInput := &models.UserInfo{}
 	if err := json.NewDecoder(r.Body).Decode(&userInput); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)

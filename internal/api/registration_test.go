@@ -86,14 +86,14 @@ func TestRegistration(t *testing.T) {
 			},
 		},
 	}
-	handler := &Handler{
+	ur := &UserRouter{
 		Mux: chi.NewMux(),
 		Cursor: &db.Cursor{
 			DBInterface: mocks.NewMock(),
 		},
 	}
-	handler.Post("/api/user/register", handler.RegisterUser)
-	ts := httptest.NewServer(handler)
+	ur.Post("/api/user/register", ur.RegisterUser)
+	ts := httptest.NewServer(ur)
 
 	defer ts.Close()
 
@@ -107,7 +107,7 @@ func TestRegistration(t *testing.T) {
 
 			w := httptest.NewRecorder()
 
-			handler.ServeHTTP(w, request)
+			ur.ServeHTTP(w, request)
 			res := w.Result()
 
 			if res.StatusCode != tt.want.code {

@@ -26,28 +26,31 @@ type OrderRouter struct {
 type BalanceRouter struct {
 	*chi.Mux
 	Cursor *db.Cursor
-	// Manager *jobmanager.Jobmanager
 }
 
 type Handler struct {
 	*chi.Mux
 	Cursor *db.Cursor
-	// Manager *jobmanager.Jobmanager
 }
 
 func NewHandler(cursor *db.Cursor, manager *jobmanager.Jobmanager) *Handler {
 	handler := &Handler{
 		Mux:    chi.NewMux(),
 		Cursor: cursor,
-		// Manager: jobmanager.NewJobmanager(cursor, accrualURL),
 	}
 	handler.Use(GzipHandle)
 	handler.Use(handler.CookieHandle)
 	handler.Use(middleware.Timeout(REQUESTTIMEOUT * time.Second))
 
+	userRouter := &UserRouter{
+		Mux:    chi.NewMux(),
+		Cursor: cursor,
+	}
+
 	handler.Route("/api/user", func(r chi.Router) {
-		r.Post("/register", handler.RegisterUser)
-		r.Post("/login", handler.Login)
+
+		r.Post("/register", userRouter.RegisterUser)
+		r.Post("/login", userRouter.Login)
 
 		r.Get("/withdrawals", handler.GetWithdrawals)
 		r.Get("/balance", handler.GetBalance)

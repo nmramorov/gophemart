@@ -105,8 +105,14 @@ func TestPostOrders(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
-	handler.Post("/api/user/register", handler.RegisterUser)
-	handler.Post("/api/user/login", handler.Login)
+	ur := &UserRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
+	handler.Post("/api/user/register", ur.RegisterUser)
+	handler.Post("/api/user/login", ur.Login)
 	handler.Post("/api/user/orders", r.UploadOrder)
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{

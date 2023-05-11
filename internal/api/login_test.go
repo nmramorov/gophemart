@@ -101,15 +101,15 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	}
-	handler := &Handler{
+	ur := &UserRouter{
 		Mux: chi.NewMux(),
 		Cursor: &db.Cursor{
 			DBInterface: mocks.NewMock(),
 		},
 	}
-	handler.Post("/api/user/login", handler.Login)
-	ts := httptest.NewServer(handler)
-	handler.Cursor.SaveUserInfo(&models.UserInfo{
+	ur.Post("/api/user/login", ur.Login)
+	ts := httptest.NewServer(ur)
+	ur.Cursor.SaveUserInfo(&models.UserInfo{
 		Username: "test",
 		Password: "test",
 	})
@@ -126,7 +126,7 @@ func TestAuthentication(t *testing.T) {
 
 			w := httptest.NewRecorder()
 
-			handler.ServeHTTP(w, request)
+			ur.ServeHTTP(w, request)
 			res := w.Result()
 
 			if res.StatusCode != tt.want.code {
