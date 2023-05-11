@@ -33,10 +33,6 @@ func NewMock() *MockDB {
 	}
 }
 
-func (mock *MockDB) Connect() {}
-
-func (mock *MockDB) Update() {}
-
 func (mock *MockDB) SaveSession(id string, session *models.Session) {
 	mock.sessions[id] = *session
 }

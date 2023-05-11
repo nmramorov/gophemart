@@ -15,10 +15,8 @@ import (
 )
 
 type DBInterface interface {
-	Connect()
 	SaveUserInfo(*models.UserInfo) bool
 	GetUserInfo(*models.UserInfo) (*models.UserInfo, error)
-	Update()
 	SaveSession(string, *models.Session)
 	GetSession(string) (*models.Session, bool)
 	GetOrder(string, string) (*models.Order, error)
