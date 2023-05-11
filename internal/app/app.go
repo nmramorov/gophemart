@@ -28,14 +28,16 @@ func NewApp(config *config.Config) *App {
 	logger.InfoLog.Printf("Application is running on addr %s", config.Address)
 	logger.InfoLog.Printf("Accrual addr is %s", config.Accrual)
 	logger.InfoLog.Printf("DB addr is %s", config.DatabaseURI)
-	handler := api.NewHandler(config.Accrual, db.GetCursor(config.DatabaseURI))
+	cursor := db.GetCursor(config.DatabaseURI)
+	manager := jobmanager.NewJobmanager(cursor, config.Accrual)
+	handler := api.NewHandler(cursor, manager)
 	server := &http.Server{
 		Addr:    config.Address,
 		Handler: handler,
 	}
 	return &App{
 		config:  config,
-		manager: handler.Manager,
+		manager: manager,
 		Server:  server,
 	}
 }

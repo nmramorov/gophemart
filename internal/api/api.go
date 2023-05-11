@@ -31,15 +31,15 @@ type BalanceRouter struct {
 
 type Handler struct {
 	*chi.Mux
-	Cursor  *db.Cursor
-	Manager *jobmanager.Jobmanager
+	Cursor *db.Cursor
+	// Manager *jobmanager.Jobmanager
 }
 
-func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
+func NewHandler(cursor *db.Cursor, manager *jobmanager.Jobmanager) *Handler {
 	handler := &Handler{
-		Mux:     chi.NewMux(),
-		Cursor:  cursor,
-		Manager: jobmanager.NewJobmanager(cursor, accrualURL),
+		Mux:    chi.NewMux(),
+		Cursor: cursor,
+		// Manager: jobmanager.NewJobmanager(cursor, accrualURL),
 	}
 	handler.Use(GzipHandle)
 	handler.Use(handler.CookieHandle)
@@ -53,16 +53,17 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 		r.Get("/balance", handler.GetBalance)
 		r.Post("/balance/withdraw", handler.WithdrawMoney)
 
-		OrdersRouter := NewOrdersRouter(cursor)
+		OrdersRouter := NewOrdersRouter(cursor, manager)
 		r.Mount("/orders", OrdersRouter)
 	})
 
 	return handler
 }
 
-func NewOrdersRouter(cursor *db.Cursor) *OrderRouter {
+func NewOrdersRouter(cursor *db.Cursor, manager *jobmanager.Jobmanager) *OrderRouter {
 	r := &OrderRouter{
-		Cursor: cursor,
+		Cursor:  cursor,
+		Manager: manager,
 	}
 	r.Post("/", r.UploadOrder)
 	r.Get("/", r.GetOrders)

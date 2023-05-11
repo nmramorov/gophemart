@@ -8,11 +8,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/nmramorov/gophemart/internal/db"
+	"github.com/nmramorov/gophemart/internal/jobmanager"
 	"github.com/nmramorov/gophemart/internal/mocks"
 )
 
 func TestCookiesMiddleware(t *testing.T) {
-	handler := NewHandler("http://localhost:8081", &db.Cursor{DBInterface: mocks.NewMock()})
+	cursor := &db.Cursor{DBInterface: mocks.NewMock()}
+	manager := jobmanager.NewJobmanager(cursor, "http://localhost:8081")
+	handler := NewHandler(cursor, manager)
 	ts := httptest.NewServer(handler)
 
 	defer ts.Close()
