@@ -18,10 +18,10 @@ type App struct {
 
 func (a *App) Run() {
 	go a.manager.ManageJobs(a.config.Accrual)
-	a.Server.ListenAndServe()
-	// if err != nil {
-	// 	logger.ErrorLog.Fatalf("Server error: %e", err)
-	// }
+	err := a.Server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		logger.ErrorLog.Fatalf("Server error: %e", err)
+	}
 }
 
 func NewApp(config *config.Config) *App {
