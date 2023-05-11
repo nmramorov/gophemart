@@ -15,7 +15,8 @@ func NewEnvConfig() (*EnvConfig, error) {
 	var config EnvConfig
 	err := env.Parse(&config)
 	if err != nil {
-		logger.ErrorLog.Fatalf("Error with env config: %e", err)
+		logger.ErrorLog.Printf("Error with env config: %e", err)
+		return nil, err
 	}
 	return &config, nil
 }

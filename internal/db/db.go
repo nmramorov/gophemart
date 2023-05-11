@@ -125,13 +125,13 @@ func (c *DBCursor) SaveUserInfo(info *models.UserInfo) error {
 func (c *DBCursor) GetUserInfo(info *models.UserInfo) (*models.UserInfo, error) {
 	var row *sql.Row
 	if row = c.DB.QueryRowContext(c.Context, GetUserInfo, info.Username); row.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting user info from db: %e", row.Err())
+		logger.ErrorLog.Printf("error during getting user info from db: %e", row.Err())
 		return nil, row.Err()
 	}
 	foundInfo := &models.UserInfo{}
 	err := row.Scan(&foundInfo.Username, &foundInfo.Password)
 	if err != nil {
-		logger.ErrorLog.Fatalf("error scanning userinfo from db: %e", err)
+		logger.ErrorLog.Printf("error scanning userinfo from db: %e", err)
 		return nil, err
 	}
 	return foundInfo, nil
@@ -140,7 +140,7 @@ func (c *DBCursor) GetUserInfo(info *models.UserInfo) (*models.UserInfo, error) 
 func (c *DBCursor) GetOrder(username string, number string) (*models.Order, error) {
 	var row *sql.Row
 	if row = c.DB.QueryRowContext(c.Context, GetOrder, username, number); row.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting order %s from db: %e", number, row.Err())
+		logger.ErrorLog.Printf("error during getting order %s from db: %e", number, row.Err())
 		return nil, row.Err()
 	}
 	foundOrder := &models.Order{}
@@ -150,7 +150,7 @@ func (c *DBCursor) GetOrder(username string, number string) (*models.Order, erro
 		return nil, nil
 	}
 	if err != nil {
-		logger.ErrorLog.Fatalf("error scanning single order from db: %e", err)
+		logger.ErrorLog.Printf("error scanning single order from db: %e", err)
 		return nil, err
 	}
 	return foundOrder, nil
@@ -168,18 +168,18 @@ func (c *DBCursor) SaveOrder(order *models.Order) error {
 func (c *DBCursor) GetOrders(username string) ([]*models.Order, error) {
 	rows, err := c.DB.QueryContext(c.Context, GetOrders, username)
 	if err != nil {
-		logger.ErrorLog.Fatalf("error during getting orders from db: %e", err)
+		logger.ErrorLog.Printf("error during getting orders from db: %e", err)
 		return nil, err
 	}
 	if rows.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting orders from db: %e", rows.Err())
+		logger.ErrorLog.Printf("error during getting orders from db: %e", rows.Err())
 		return nil, rows.Err()
 	}
 	foundOrders := []*models.Order{}
 	for rows.Next() {
 		var o models.Order
 		if err = rows.Scan(&o.Username, &o.Number, &o.Status, &o.Accrual, &o.UploadedAt); err != nil {
-			logger.ErrorLog.Fatalf("error scanning order for %s from db: %e", username, err)
+			logger.ErrorLog.Printf("error scanning order for %s from db: %e", username, err)
 			return foundOrders, err
 		}
 		foundOrders = append(foundOrders, &o)
@@ -190,13 +190,13 @@ func (c *DBCursor) GetOrders(username string) ([]*models.Order, error) {
 func (c *DBCursor) GetUsernameByToken(token string) (string, error) {
 	var row *sql.Row
 	if row = c.DB.QueryRowContext(c.Context, GetSessionUser, token); row.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting current session user from db: %e", row.Err())
+		logger.ErrorLog.Printf("error during getting current session user from db: %e", row.Err())
 		return "", row.Err()
 	}
 	foundSession := &models.Session{}
 	err := row.Scan(&foundSession.Username)
 	if err != nil {
-		logger.ErrorLog.Fatalf("error scanning session username from db: %e", err)
+		logger.ErrorLog.Printf("error scanning session username from db: %e", err)
 		return "", err
 	}
 	return foundSession.Username, nil
@@ -205,7 +205,7 @@ func (c *DBCursor) GetUsernameByToken(token string) (string, error) {
 func (c *DBCursor) GetUserBalance(username string) (*models.Balance, error) {
 	var row *sql.Row
 	if row = c.DB.QueryRowContext(c.Context, GetBalance, username); row.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting user balance from db: %e", row.Err())
+		logger.ErrorLog.Printf("error during getting user balance from db: %e", row.Err())
 		return nil, row.Err()
 	}
 	logger.InfoLog.Printf("Getting balance for user %s", username)
@@ -215,7 +215,7 @@ func (c *DBCursor) GetUserBalance(username string) (*models.Balance, error) {
 		return foundBalance, nil
 	}
 	if err != nil {
-		logger.ErrorLog.Fatalf("error scanning balance from db: %e", err)
+		logger.ErrorLog.Printf("error scanning balance from db: %e", err)
 		return nil, err
 	}
 	return foundBalance, nil
@@ -246,18 +246,18 @@ func (c *DBCursor) GetWithdrawals(username string) ([]*models.Withdrawal, error)
 	rows, err := c.DB.QueryContext(c.Context, GetWithdrawals, username)
 
 	if err != nil {
-		logger.ErrorLog.Fatalf("error during getting withdrawals from db: %e", err)
+		logger.ErrorLog.Printf("error during getting withdrawals from db: %e", err)
 		return nil, err
 	}
 	if rows.Err() != nil {
-		logger.ErrorLog.Fatalf("error during getting withdrawals from db: %e", rows.Err())
+		logger.ErrorLog.Printf("error during getting withdrawals from db: %e", rows.Err())
 		return nil, rows.Err()
 	}
 	foundWithdrawals := []*models.Withdrawal{}
 	for rows.Next() {
 		var w models.Withdrawal
 		if err := rows.Scan(&w.User, &w.Order, &w.Sum, &w.ProcessedAt); err != nil {
-			logger.ErrorLog.Fatalf("error scanning withdrawal from db: %e", err)
+			logger.ErrorLog.Printf("error scanning withdrawal from db: %e", err)
 			return foundWithdrawals, err
 		}
 		foundWithdrawals = append(foundWithdrawals, &w)

@@ -33,7 +33,7 @@ func NewJobmanager(cursor *db.Cursor, accrualURL string) *Jobmanager {
 	}
 }
 
-func (jm *Jobmanager) AskAccrual(url string, number string) (*models.AccrualResponse, int) {
+func (jm *Jobmanager) AskAccrual(url string, number string) (*models.AccrualResponse, int, error) {
 	acc := models.AccrualResponse{}
 	req := jm.client.R().
 		SetResult(&acc).
@@ -41,25 +41,32 @@ func (jm *Jobmanager) AskAccrual(url string, number string) (*models.AccrualResp
 
 	resp, err := req.Get("/api/orders/{number}")
 	if err != nil {
-		logger.ErrorLog.Fatalf("Error getting order from accrual: %e", err)
+		logger.ErrorLog.Printf("Error getting order from accrual: %e", err)
+		return nil, 0, err
 	}
 	logger.InfoLog.Printf("Accrual GET status code: %d", resp.StatusCode())
 	if resp.StatusCode() == 429 {
-		return nil, resp.StatusCode()
+		return nil, resp.StatusCode(), nil
 	}
 	if resp.StatusCode() == 204 {
-		return &models.AccrualResponse{Status: "NEW"}, 204
+		return &models.AccrualResponse{Status: "NEW"}, 204, nil
 	}
-	return &acc, resp.StatusCode()
+	return &acc, resp.StatusCode(), nil
 }
 
-func (jm *Jobmanager) RunJob(job *Job) {
-	response, statusCode := jm.AskAccrual(jm.AccrualURL, job.orderNumber)
+func (jm *Jobmanager) RunJob(job *Job) error {
+	response, statusCode, err := jm.AskAccrual(jm.AccrualURL, job.orderNumber)
+	if err != nil {
+		return err
+	}
 	if statusCode == 429 {
 		time.Sleep(time.Second)
 	}
 	for response.Status != "INVALID" && response.Status != "PROCESSED" {
-		response, statusCode = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
+		response, statusCode, err = jm.AskAccrual(jm.AccrualURL, job.orderNumber)
+		if err != nil {
+			return err
+		}
 		if statusCode == 429 {
 			time.Sleep(time.Second)
 			continue
@@ -76,6 +83,7 @@ func (jm *Jobmanager) RunJob(job *Job) {
 	})
 	jm.mu.Unlock()
 	logger.InfoLog.Println("Job finished")
+	return nil
 }
 
 func (jm *Jobmanager) AddJob(orderNumber string, username string) {
