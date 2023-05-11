@@ -68,7 +68,7 @@ func TestBalanceGet(t *testing.T) {
 		Password: "test",
 	})
 
-	result := handler.Cursor.UpdateUserBalance(
+	result, _ := handler.Cursor.UpdateUserBalance(
 		"test", expectedBalance,
 	)
 	assert.Equal(t, expectedBalance, result)

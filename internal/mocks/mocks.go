@@ -33,20 +33,21 @@ func NewMock() *MockDB {
 	}
 }
 
-func (mock *MockDB) SaveSession(id string, session *models.Session) {
+func (mock *MockDB) SaveSession(id string, session *models.Session) error {
 	mock.sessions[id] = *session
+	return nil
 }
 
-func (mock *MockDB) SaveUserInfo(info *models.UserInfo) bool {
+func (mock *MockDB) SaveUserInfo(info *models.UserInfo) error {
 
 	for k := range mock.storage {
 		if k == info.Username {
-			return false
+			return errors.ErrDatabaseSQLQuery
 		}
 	}
 
 	mock.storage[info.Username] = info.Password
-	return true
+	return nil
 }
 
 func (mock *MockDB) GetUserInfo(info *models.UserInfo) (*models.UserInfo, error) {
@@ -75,8 +76,9 @@ func (mock *MockDB) GetOrder(username string, number string) (*models.Order, err
 	return nil, nil
 }
 
-func (mock *MockDB) SaveOrder(order *models.Order) {
+func (mock *MockDB) SaveOrder(order *models.Order) error {
 	mock.orders[order.Username] = append(mock.orders[order.Username], order)
+	return nil
 }
 
 func (mock *MockDB) GetOrders(username string) ([]*models.Order, error) {
@@ -102,20 +104,21 @@ func (mock *MockDB) GetUserBalance(username string) (*models.Balance, error) {
 	return balance, nil
 }
 
-func (mock *MockDB) UpdateUserBalance(username string, newBalance *models.Balance) *models.Balance {
+func (mock *MockDB) UpdateUserBalance(username string, newBalance *models.Balance) (*models.Balance, error) {
 	mock.balance[username] = newBalance
-	return newBalance
+	return newBalance, nil
 }
 
 func (mock *MockDB) GetWithdrawals(username string) ([]*models.Withdrawal, error) {
 	return mock.withdrawals[username], nil
 }
 
-func (mock *MockDB) SaveWithdrawal(withdrawal *models.Withdrawal) {
+func (mock *MockDB) SaveWithdrawal(withdrawal *models.Withdrawal) error {
 	mock.withdrawals[withdrawal.User] = append(mock.withdrawals[withdrawal.User], withdrawal)
+	return nil
 }
 
-func (mock *MockDB) UpdateOrder(username string, from *models.AccrualResponse) {
+func (mock *MockDB) UpdateOrder(username string, from *models.AccrualResponse) error {
 	orders := mock.orders[username]
 	for _, order := range orders {
 		if order.Number == from.Order {
@@ -128,20 +131,21 @@ func (mock *MockDB) UpdateOrder(username string, from *models.AccrualResponse) {
 			break
 		}
 	}
+	return nil
 }
 
-func (mock *MockDB) GetSession(token string) (*models.Session, bool) {
+func (mock *MockDB) GetSession(token string) (*models.Session, error) {
 	session, ok := mock.sessions[token]
 	if !ok {
-		return nil, false
+		return nil, errors.ErrDatabaseSQLQuery
 	}
-	return &session, true
+	return &session, nil
 }
 
-func (mock *MockDB) GetAllOrders() []*models.Order {
+func (mock *MockDB) GetAllOrders() ([]*models.Order, error) {
 	result := make([]*models.Order, 0)
 	for _, orders := range mock.orders {
 		result = append(result, orders...)
 	}
-	return result
+	return result, nil
 }

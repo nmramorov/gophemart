@@ -41,11 +41,14 @@ func (h *BalanceRouter) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 		Sum:         withrawal.Sum,
 		ProcessedAt: time.Now(),
 	})
-	_ = h.Cursor.UpdateUserBalance(username, &models.Balance{
+	_, err = h.Cursor.UpdateUserBalance(username, &models.Balance{
 		User:      username,
 		Current:   resultedAccrual,
 		Withdrawn: resultedWithdrawn,
 	})
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
 
 	rw.WriteHeader(http.StatusOK)
 	rw.Write([]byte(`success`))

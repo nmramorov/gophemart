@@ -24,7 +24,10 @@ func ValidateLogin(input *models.UserInfo, existingInfo *models.UserInfo) error 
 }
 
 func ValidateOrder(cursor *db.Cursor, newOrder *models.Order) error {
-	orders := cursor.GetAllOrders()
+	orders, err := cursor.GetAllOrders()
+	if err != nil {
+		return err
+	}
 	for _, order := range orders {
 		if order.Number == newOrder.Number {
 			return errors.ErrValidation

@@ -60,8 +60,8 @@ func (h *Handler) CookieHandle(next http.Handler) http.Handler {
 		sessionToken := c.Value
 
 		// We then get the session from our session map
-		userSession, exists := h.Cursor.GetSession(sessionToken)
-		if !exists {
+		userSession, err := h.Cursor.GetSession(sessionToken)
+		if err != nil {
 			// If the session token is not present in session map, return an unauthorized error
 			w.WriteHeader(http.StatusUnauthorized)
 			return
