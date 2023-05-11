@@ -62,6 +62,7 @@ func NewHandler(cursor *db.Cursor, manager *jobmanager.Jobmanager) *Handler {
 
 func NewOrdersRouter(cursor *db.Cursor, manager *jobmanager.Jobmanager) *OrderRouter {
 	r := &OrderRouter{
+		Mux:     chi.NewMux(),
 		Cursor:  cursor,
 		Manager: manager,
 	}
