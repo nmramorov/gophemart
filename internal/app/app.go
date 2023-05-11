@@ -1,7 +1,6 @@
 package app
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/nmramorov/gophemart/internal/api"
@@ -19,7 +18,7 @@ type App struct {
 
 func (a *App) Run() {
 	go a.manager.ManageJobs(a.config.Accrual)
-	log.Fatal(a.Server.ListenAndServe())
+	a.Server.ListenAndServe()
 	// if err != nil {
 	// 	logger.ErrorLog.Fatalf("Server error: %e", err)
 	// }

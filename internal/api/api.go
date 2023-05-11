@@ -11,7 +11,7 @@ import (
 	"github.com/nmramorov/gophemart/internal/jobmanager"
 )
 
-const REQUEST_TIMEOUT = 60
+const REQUESTTIMEOUT = 60
 
 type Handler struct {
 	*chi.Mux
@@ -27,7 +27,7 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 	}
 	handler.Use(GzipHandle)
 	handler.Use(handler.CookieHandle)
-	handler.Use(middleware.Timeout(REQUEST_TIMEOUT * time.Second))
+	handler.Use(middleware.Timeout(REQUESTTIMEOUT * time.Second))
 
 	handler.Route("/api/user", func(r chi.Router) {
 		UserRouter := NewUserRouter(handler)
