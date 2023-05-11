@@ -33,10 +33,10 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 		r.Post("/register", handler.RegisterUser)
 		r.Post("/login", handler.Login)
 
-		r.Route("/orders", func(r chi.Router) {
-			r.Post("/", handler.UploadOrder)
-			r.Get("/", handler.GetOrders)
-		})
+		// r.Route("/orders", func(r chi.Router) {
+		// 	r.Post("/", handler.UploadOrder)
+		// 	r.Get("/", handler.GetOrders)
+		// })
 
 		r.Get("/withdrawals", handler.GetWithdrawals)
 		r.Get("/balance", handler.GetBalance)
@@ -44,8 +44,8 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 		// UserRouter := NewUserRouter(handler)
 		// r.Mount("/", UserRouter)
 
-		// OrdersRouter := NewOrdersRouter(handler)
-		// r.Mount("/", OrdersRouter)
+		OrdersRouter := NewOrdersRouter(handler)
+		r.Mount("/orders", OrdersRouter)
 
 		// BalanceWithdrawalRouter := NewBalanceWithdrawalsRouter(handler)
 		// r.Mount("/", BalanceWithdrawalRouter)
@@ -54,24 +54,9 @@ func NewHandler(accrualURL string, cursor *db.Cursor) *Handler {
 	return handler
 }
 
-func NewUserRouter(handler *Handler) http.Handler {
-	r := chi.NewRouter()
-	r.Post("/register", handler.RegisterUser)
-	r.Post("/login", handler.Login)
-	return r
-}
-
 func NewOrdersRouter(handler *Handler) http.Handler {
 	r := chi.NewRouter()
-	r.Post("/orders", handler.UploadOrder)
-	r.Get("/orders", handler.GetOrders)
-	return r
-}
-
-func NewBalanceWithdrawalsRouter(handler *Handler) http.Handler {
-	r := chi.NewRouter()
-	r.Get("/withdrawals", handler.GetWithdrawals)
-	r.Get("/balance", handler.GetBalance)
-	r.Post("/balance/withdraw", handler.WithdrawMoney)
+	r.Post("/", handler.UploadOrder)
+	r.Get("/", handler.GetOrders)
 	return r
 }
