@@ -106,12 +106,12 @@ func (jm *Jobmanager) AddJob(orderNumber string, username string) error {
 }
 
 func (jm *Jobmanager) ManageJobs(accrualURL string) {
+	var wg sync.WaitGroup
 	select {
 	case <-jm.context.Done():
 		close(jm.Jobs)
 		jm.cancel()
 	default:
-		var wg sync.WaitGroup
 		for job := range jm.Jobs {
 			wg.Add(1)
 			logger.InfoLog.Printf("Running job for order %s", job.orderNumber)
@@ -119,7 +119,5 @@ func (jm *Jobmanager) ManageJobs(accrualURL string) {
 			wg.Done()
 		}
 	}
-
-	// close(jm.Jobs)
-	// jm.cancel()
+	wg.Wait()
 }

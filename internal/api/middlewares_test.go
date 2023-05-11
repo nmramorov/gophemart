@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,7 +15,8 @@ import (
 
 func TestCookiesMiddleware(t *testing.T) {
 	cursor := &db.Cursor{DBInterface: mocks.NewMock()}
-	manager := jobmanager.NewJobmanager(cursor, "http://localhost:8081")
+	ctx := context.Background()
+	manager := jobmanager.NewJobmanager(cursor, "http://localhost:8081", &ctx)
 	handler := NewHandler(cursor, manager)
 	ts := httptest.NewServer(handler)
 
