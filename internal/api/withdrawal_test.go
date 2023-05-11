@@ -86,8 +86,14 @@ func TestWithdrawal(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
+	br := &BalanceRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
 	handler.Post("/api/user/login", ur.Login)
-	handler.Post("/api/user/balance/withdraw", handler.WithdrawMoney)
+	handler.Post("/api/user/balance/withdraw", br.WithdrawMoney)
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{
 		Username: "test",
@@ -220,8 +226,14 @@ func TestGetWithdrawal(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
+	br := &BalanceRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
 	handler.Post("/api/user/login", ur.Login)
-	handler.Get("/api/user/withdrawals", handler.GetWithdrawals)
+	handler.Get("/api/user/withdrawals", br.GetWithdrawals)
 	handler.Post("/api/user/register", ur.RegisterUser)
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{

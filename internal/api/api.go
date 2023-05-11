@@ -47,14 +47,19 @@ func NewHandler(cursor *db.Cursor, manager *jobmanager.Jobmanager) *Handler {
 		Cursor: cursor,
 	}
 
+	balanceRouter := &BalanceRouter{
+		Mux:    chi.NewMux(),
+		Cursor: cursor,
+	}
+
 	handler.Route("/api/user", func(r chi.Router) {
 
 		r.Post("/register", userRouter.RegisterUser)
 		r.Post("/login", userRouter.Login)
 
-		r.Get("/withdrawals", handler.GetWithdrawals)
-		r.Get("/balance", handler.GetBalance)
-		r.Post("/balance/withdraw", handler.WithdrawMoney)
+		r.Get("/withdrawals", balanceRouter.GetWithdrawals)
+		r.Get("/balance", balanceRouter.GetBalance)
+		r.Post("/balance/withdraw", balanceRouter.WithdrawMoney)
 
 		OrdersRouter := NewOrdersRouter(cursor, manager)
 		r.Mount("/orders", OrdersRouter)

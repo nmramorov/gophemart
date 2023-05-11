@@ -9,7 +9,7 @@ import (
 	"github.com/nmramorov/gophemart/internal/models"
 )
 
-func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
+func (h *BalanceRouter) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 	withrawal := &models.WithdrawalPost{}
 	if err := json.NewDecoder(r.Body).Decode(&withrawal); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
@@ -51,7 +51,7 @@ func (h *Handler) WithdrawMoney(rw http.ResponseWriter, r *http.Request) {
 	rw.Write([]byte(`success`))
 }
 
-func (h *Handler) GetWithdrawals(rw http.ResponseWriter, r *http.Request) {
+func (h *BalanceRouter) GetWithdrawals(rw http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("session_token")
 	sessionToken := cookie.Value
 	username, err := h.Cursor.GetUsernameByToken(sessionToken)

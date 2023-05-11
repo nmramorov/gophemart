@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func (h *Handler) GetBalance(rw http.ResponseWriter, r *http.Request) {
+func (h *BalanceRouter) GetBalance(rw http.ResponseWriter, r *http.Request) {
 	cookie, _ := r.Cookie("session_token")
 	sessionToken := cookie.Value
 	username, err := h.Cursor.GetUsernameByToken(sessionToken)

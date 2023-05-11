@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/nmramorov/gophemart/internal/db"
-	"github.com/nmramorov/gophemart/internal/models"
 	"github.com/nmramorov/gophemart/internal/mocks"
+	"github.com/nmramorov/gophemart/internal/models"
 )
 
 func TestBalanceGet(t *testing.T) {
@@ -53,9 +53,15 @@ func TestBalanceGet(t *testing.T) {
 			DBInterface: mocks.NewMock(),
 		},
 	}
+	br := &BalanceRouter{
+		Mux: chi.NewMux(),
+		Cursor: &db.Cursor{
+			DBInterface: mocks.NewMock(),
+		},
+	}
 	handler.Post("/api/user/register", ur.RegisterUser)
 	handler.Post("/api/user/login", ur.Login)
-	handler.Get("/api/user/balance", handler.GetBalance)
+	handler.Get("/api/user/balance", br.GetBalance)
 	ts := httptest.NewServer(handler)
 	handler.Cursor.SaveUserInfo(&models.UserInfo{
 		Username: "test",
