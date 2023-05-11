@@ -15,6 +15,8 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
+const DBTIMEOUT = 1
+
 type DBInterface interface {
 	SaveUserInfo(*models.UserInfo) bool
 	GetUserInfo(*models.UserInfo) (*models.UserInfo, error)
@@ -51,17 +53,20 @@ type DBCursor struct {
 	Context context.Context
 }
 
-func RunMigrations(databaseURL string) {
+func RunMigrations(databaseURL string) error {
 	m, err := migrate.New(
 		"file://./migrations",
 		databaseURL)
 	if err != nil {
-		logger.ErrorLog.Fatal(err)
+		logger.ErrorLog.Printf("Error creating migration: %e", err)
+		return errors.ErrDatabaseMigration
 	}
 	if err := m.Up(); err != nil {
-		logger.ErrorLog.Fatal(err)
+		logger.ErrorLog.Printf("Error executing migration: %e", err)
+		return errors.ErrDatabaseMigration
 	}
 	logger.InfoLog.Println("Migrations successfully executed")
+	return nil
 }
 
 func NewCursor(DBURL string) (*DBCursor, error) {
@@ -78,7 +83,10 @@ func NewCursor(DBURL string) (*DBCursor, error) {
 		logger.ErrorLog.Println(err)
 		return nil, err
 	}
-	RunMigrations(DBURL)
+	err = RunMigrations(DBURL)
+	if err != nil {
+		return nil, err
+	}
 	return new, nil
 }
 
@@ -87,7 +95,7 @@ func (c *DBCursor) Close() {
 }
 
 func (c *DBCursor) Ping() error {
-	ctx, cancel := context.WithTimeout(c.Context, 1*time.Second)
+	ctx, cancel := context.WithTimeout(c.Context, DBTIMEOUT*time.Second)
 	defer cancel()
 	if err := c.DB.PingContext(ctx); err != nil {
 		logger.ErrorLog.Printf("ping error, database unreachable?: %e", err)
