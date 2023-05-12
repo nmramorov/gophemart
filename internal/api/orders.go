@@ -68,7 +68,11 @@ func (h *OrderRouter) UploadOrder(rw http.ResponseWriter, r *http.Request) {
 			return
 		}
 		h.Cursor.SaveOrder(newOrder)
-		h.Manager.AddJob(requestNumber, username)
+		err = h.Manager.AddJob(requestNumber, username)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		rw.WriteHeader(http.StatusAccepted)
 		rw.Write([]byte(`new order created`))
 		return
