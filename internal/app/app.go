@@ -21,6 +21,8 @@ func (a *App) Run() {
 	go a.manager.ManageJobs(a.config.Accrual)
 	err := a.Server.ListenAndServe()
 	if err != nil && err != http.ErrServerClosed {
+		logger.InfoLog.Println("Shutting down jobmanager")
+		a.manager.Shutdown()
 		logger.ErrorLog.Fatalf("Server error: %e", err)
 	}
 }

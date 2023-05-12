@@ -26,7 +26,7 @@ type Jobmanager struct {
 	mu         sync.Mutex
 	client     *resty.Client
 	context    context.Context
-	cancel     context.CancelFunc
+	Shutdown     context.CancelFunc
 }
 
 const JOBTIMEOUT = 10
@@ -39,7 +39,7 @@ func NewJobmanager(cursor *db.Cursor, accrualURL string, parent *context.Context
 		Cursor:     cursor,
 		client:     resty.New().SetBaseURL(accrualURL),
 		context:    ctx,
-		cancel:     cancel,
+		Shutdown:     cancel,
 	}
 }
 
@@ -110,7 +110,6 @@ func (jm *Jobmanager) ManageJobs(accrualURL string) {
 	select {
 	case <-jm.context.Done():
 		close(jm.Jobs)
-		jm.cancel()
 	default:
 		for job := range jm.Jobs {
 			wg.Add(1)
